@@ -1,0 +1,11 @@
+---
+/**
+ * Google Search Console — meta tag de verificação.
+ * Pegue o valor no console.google.com/search-console (método "Tag HTML").
+ */
+interface Props {
+  token?: string;
+}
+const { token } = Astro.props;
+---
+{token && <meta name="google-site-verification" content={token} />}

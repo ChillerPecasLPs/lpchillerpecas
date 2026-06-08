@@ -1,0 +1,44 @@
+{
+  "atende-todas-marcas": {
+    "id": "atende-todas-marcas",
+    "ordem": 1,
+    "pergunta": "A Chiller Peças atende todas as marcas de chiller?",
+    "resposta": "Sim. Trabalhamos com peças originais para as principais marcas do mercado: Carrier, Trane, York, Copeland, Hitachi, Chemours, Bitzer, Danfoss, entre outras. Se você não encontrou a peça no nosso catálogo, fale com a gente pelo WhatsApp que localizamos para você."
+  },
+  "prazo-entrega": {
+    "id": "prazo-entrega",
+    "ordem": 2,
+    "pergunta": "Qual o prazo de entrega das peças?",
+    "resposta": "Para São Paulo Capital, o despacho acontece em até 24 horas após a confirmação do pagamento, com opção de envio expresso. Para outras regiões do Brasil, o prazo depende da transportadora escolhida. Temos mais de 30 mil itens em estoque para envio imediato."
+  },
+  "pecas-originais": {
+    "id": "pecas-originais",
+    "ordem": 3,
+    "pergunta": "As peças são originais?",
+    "resposta": "Sim, todas as peças comercializadas são originais dos fabricantes. Somos revendedores independentes e garantimos a procedência de cada componente. Atuamos como revenda, não como distribuidor oficial — isso nos dá flexibilidade para trabalhar com múltiplas marcas."
+  },
+  "como-cotar": {
+    "id": "como-cotar",
+    "ordem": 4,
+    "pergunta": "Como solicito uma cotação?",
+    "resposta": "O canal mais rápido é pelo WhatsApp (11) 94051-8767. Basta clicar em qualquer botão de cotação do site, informar seu telefone e nossa equipe retorna em até 24 horas com o orçamento personalizado. Também atendemos pelo e-mail vendas@chillerpecas.com."
+  },
+  "atende-fora-sp": {
+    "id": "atende-fora-sp",
+    "ordem": 5,
+    "pergunta": "Vocês atendem empresas fora de São Paulo?",
+    "resposta": "Sim. Atendemos todo o território nacional. A sede fica no Tatuapé, em São Paulo/SP, mas despachamos peças para qualquer estado do Brasil via transportadora. Frete grátis para pedidos acima de R$ 599,90."
+  },
+  "horario-atendimento": {
+    "id": "horario-atendimento",
+    "ordem": 6,
+    "pergunta": "Qual o horário de atendimento?",
+    "resposta": "Atendemos de segunda a quinta das 7h às 18h, sexta das 7h às 17h e sábados das 8h às 13h. Domingos e feriados não há expediente. Para urgências fora do horário comercial, deixe mensagem no WhatsApp que retornamos no início do próximo expediente."
+  },
+  "formas-pagamento": {
+    "id": "formas-pagamento",
+    "ordem": 7,
+    "pergunta": "Quais são as formas de pagamento aceitas?",
+    "resposta": "Trabalhamos com PIX (6% de desconto), cartão de crédito parcelado em até 6x sem juros e boleto bancário. Para empresas, avaliamos faturamento com prazo mediante cadastro."
+  }
+}

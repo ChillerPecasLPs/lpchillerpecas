@@ -1,0 +1,132 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getEntry } from 'astro:content';
+
+const site = (await getEntry('site', 'config'))!.data;
+---
+
+<BaseLayout
+  title="Acessibilidade · Chiller Peças"
+  description="Compromisso da Chiller Peças com acessibilidade digital — WCAG 2.1 AA, navegação por teclado, contraste e canal de feedback."
+  variant="legal"
+>
+  <main class="bg-white">
+    <article class="max-w-3xl mx-auto px-4 md:px-8 py-12 md:py-20">
+      <header class="mb-10">
+        <p class="font-sans text-xs uppercase tracking-[0.25em] text-brand-500 font-bold mb-3">
+          Compromisso público
+        </p>
+        <h1 class="font-display text-4xl md:text-5xl text-brand-900 leading-[0.95] tracking-tight mb-3">
+          Acessibilidade digital
+        </h1>
+        <p class="font-sans text-sm text-brand-900/60">
+          Versão 1.0 · Atualizada em 30/04/2026
+        </p>
+      </header>
+
+      <div class="prose-cp space-y-8 font-sans text-brand-900/85 leading-relaxed">
+        <section>
+          <h2 class="font-display text-2xl text-brand-900 uppercase tracking-tight mb-3">
+            1 · Nosso compromisso
+          </h2>
+          <p>
+            A Chiller Peças (CHILLER PECAS LTDA, CNPJ {site.empresa.cnpj}) acredita que
+            informação técnica de qualidade deve estar disponível para todos. Trabalhamos
+            continuamente para que este site atenda às diretrizes <strong>WCAG 2.1 nível AA</strong>
+            (Web Content Accessibility Guidelines do W3C), referência internacional em
+            acessibilidade digital.
+          </p>
+        </section>
+
+        <section>
+          <h2 class="font-display text-2xl text-brand-900 uppercase tracking-tight mb-3">
+            2 · Recursos implementados
+          </h2>
+          <ul class="list-disc pl-6 space-y-2">
+            <li><strong>Navegação por teclado</strong>: todos os botões, links e formulários são acessíveis usando apenas <kbd class="px-1.5 py-0.5 bg-brand-light rounded text-xs">Tab</kbd>, <kbd class="px-1.5 py-0.5 bg-brand-light rounded text-xs">Enter</kbd> e <kbd class="px-1.5 py-0.5 bg-brand-light rounded text-xs">Esc</kbd>.</li>
+            <li><strong>Foco visível</strong>: indicador claro do elemento ativo durante navegação por teclado (anel azul institucional).</li>
+            <li><strong>Contraste mínimo</strong>: textos atendem o contraste 4.5:1 (texto normal) e 3:1 (texto grande) conforme WCAG.</li>
+            <li><strong>Texto alternativo</strong>: imagens funcionais possuem <code>alt</code> descritivo; imagens decorativas usam <code>aria-hidden</code>.</li>
+            <li><strong>Semântica HTML5</strong>: uso correto de <code>&lt;main&gt;</code>, <code>&lt;nav&gt;</code>, <code>&lt;article&gt;</code>, <code>&lt;section&gt;</code> e marcos ARIA.</li>
+            <li><strong>Hierarquia de títulos</strong>: H1 único por página, H2/H3 em ordem lógica.</li>
+            <li><strong>Modal acessível</strong>: o formulário de cotação usa <code>&lt;dialog&gt;</code> nativo com foco automático, fechamento via Esc e armadilha de foco.</li>
+            <li><strong>Movimento reduzido</strong>: respeitamos a preferência do sistema operacional <code>prefers-reduced-motion</code> em animações decorativas.</li>
+            <li><strong>Idioma declarado</strong>: <code>lang="pt-BR"</code> no documento ajuda leitores de tela na pronúncia correta.</li>
+            <li><strong>Formulários</strong>: rótulos visíveis associados a campos, mensagens de erro com <code>aria-live</code>.</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2 class="font-display text-2xl text-brand-900 uppercase tracking-tight mb-3">
+            3 · Tecnologias compatíveis
+          </h2>
+          <p>
+            Testamos a navegação com as seguintes combinações de navegador + tecnologia assistiva:
+          </p>
+          <ul class="list-disc pl-6 space-y-1">
+            <li>Chrome / Firefox / Edge atualizados (últimas duas versões maiores)</li>
+            <li>Safari iOS / Chrome Android (últimas duas versões)</li>
+            <li>Leitores de tela: NVDA (Windows), VoiceOver (macOS/iOS), TalkBack (Android)</li>
+          </ul>
+          <p>
+            Combinações fora dessa lista podem apresentar comportamento inesperado.
+            Reporte para nós e investigaremos.
+          </p>
+        </section>
+
+        <section>
+          <h2 class="font-display text-2xl text-brand-900 uppercase tracking-tight mb-3">
+            4 · Limitações conhecidas
+          </h2>
+          <p>
+            Estamos cientes dos seguintes pontos em melhoria contínua:
+          </p>
+          <ul class="list-disc pl-6 space-y-2">
+            <li>O mini-mapa do Google Maps embarcado no rodapé é controlado por terceiro (Google) e segue os padrões de acessibilidade da plataforma original.</li>
+            <li>Conteúdo de texto extenso (políticas, termos) ainda não possui sumário interativo — é compensado por hierarquia clara de títulos.</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2 class="font-display text-2xl text-brand-900 uppercase tracking-tight mb-3">
+            5 · Reporte uma barreira
+          </h2>
+          <p>
+            Encontrou uma dificuldade ao usar este site? Queremos saber. Entre em contato:
+          </p>
+          <ul class="list-none space-y-1 not-prose">
+            <li><strong>E-mail:</strong> <a href={`mailto:${site.email}`} class="text-brand-500 underline underline-offset-2 hover:text-brand-900">{site.email}</a></li>
+            <li><strong>Telefone:</strong> <a href={`tel:${site.telefone.replace(/\D/g, '')}`} class="text-brand-500 underline underline-offset-2 hover:text-brand-900">{site.telefone}</a></li>
+            <li><strong>WhatsApp:</strong> {site.telefoneWhatsapp}</li>
+          </ul>
+          <p class="mt-4">
+            Comprometemo-nos a responder em até <strong>15 dias úteis</strong> e a corrigir
+            barreiras críticas no próximo ciclo de manutenção do site.
+          </p>
+        </section>
+
+        <section>
+          <h2 class="font-display text-2xl text-brand-900 uppercase tracking-tight mb-3">
+            6 · Base legal
+          </h2>
+          <p>
+            Este compromisso atende:
+          </p>
+          <ul class="list-disc pl-6 space-y-1">
+            <li>Lei Brasileira de Inclusão (Lei 13.146/2015), art. 63 — acessibilidade em sítios eletrônicos</li>
+            <li>Lei Geral de Proteção de Dados (Lei 13.709/2018), art. 6º, VI — princípio da transparência</li>
+            <li>WCAG 2.1 nível AA (W3C/WAI)</li>
+          </ul>
+        </section>
+      </div>
+
+      <footer class="mt-12 pt-8 border-t border-brand-light text-sm font-sans text-brand-900/50">
+        <p>
+          <a href="/" class="text-brand-500 hover:text-brand-900 underline underline-offset-2">
+            ← Voltar para o início
+          </a>
+        </p>
+      </footer>
+    </article>
+  </main>
+</BaseLayout>

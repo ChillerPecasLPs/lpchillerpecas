@@ -1,0 +1,165 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getEntry } from 'astro:content';
+
+const site = (await getEntry('site', 'config'))!.data;
+const TERMOS_VERSAO = '1.0';
+const TERMOS_DATA = '30/04/2026';
+---
+
+<BaseLayout
+  title="Termos de Uso · Chiller Peças"
+  description="Termos e condições de uso do site Chiller Peças — modelo B2B, escopo do serviço, propriedade intelectual e foro aplicável."
+  variant="legal"
+>
+  <main class="bg-white">
+    <article class="max-w-3xl mx-auto px-4 md:px-8 py-12 md:py-20">
+      <header class="mb-10">
+        <p class="font-sans text-xs uppercase tracking-[0.25em] text-brand-500 font-bold mb-3">
+          Documento legal
+        </p>
+        <h1 class="font-display text-4xl md:text-5xl text-brand-900 leading-[0.95] tracking-tight mb-3">
+          Termos de Uso
+        </h1>
+        <p class="font-sans text-sm text-brand-900/60">
+          Versão {TERMOS_VERSAO} · Atualizada em {TERMOS_DATA}
+        </p>
+      </header>
+
+      <div class="space-y-10 font-sans text-brand-900/85 leading-relaxed">
+
+        <section aria-labelledby="t1">
+          <h2 id="t1" class="font-display text-2xl text-brand-900 uppercase tracking-tight mb-3">1 · Aceitação dos termos</h2>
+          <p>
+            Ao acessar ou utilizar o site da Chiller Peças, você declara ter lido, compreendido e
+            concordado integralmente com estes Termos de Uso e com a
+            <a href="/privacidade" class="text-brand-500 underline underline-offset-2 hover:text-brand-900">Política de Privacidade</a>.
+            Se não concorda com qualquer parte deste documento, não utilize o site.
+          </p>
+        </section>
+
+        <section aria-labelledby="t2">
+          <h2 id="t2" class="font-display text-2xl text-brand-900 uppercase tracking-tight mb-3">2 · Identificação do prestador</h2>
+          <address class="not-italic bg-brand-light/60 p-4 rounded-lg text-sm leading-relaxed">
+            <strong>{site.empresa.razaoSocial}</strong><br />
+            CNPJ {site.empresa.cnpj}<br />
+            {site.endereco.rua} · {site.endereco.bairro}<br />
+            {site.endereco.cidade}/{site.endereco.estado} · CEP {site.endereco.cep}<br />
+            Atendimento: {site.telefone} · {site.email}
+          </address>
+        </section>
+
+        <section aria-labelledby="t3">
+          <h2 id="t3" class="font-display text-2xl text-brand-900 uppercase tracking-tight mb-3">3 · Escopo do serviço</h2>
+          <p>
+            Este site é um <strong>canal informativo e de cotação</strong>. Apresenta o catálogo
+            de peças para chillers, ar-condicionado e sistemas HVAC, e permite ao usuário solicitar
+            orçamentos por meio de formulário e canal direto via WhatsApp.
+          </p>
+          <div class="bg-brand-accent/10 border-l-4 border-brand-accent p-4 rounded mt-4">
+            <p class="text-sm">
+              <strong>Importante:</strong> Não realizamos vendas online. Toda transação comercial
+              ocorre via canal direto após emissão de proposta formal pelo nosso time. Os valores,
+              prazos e condições só passam a ter validade quando confirmados em proposta escrita.
+            </p>
+          </div>
+        </section>
+
+        <section aria-labelledby="t4">
+          <h2 id="t4" class="font-display text-2xl text-brand-900 uppercase tracking-tight mb-3">4 · Modelo B2B</h2>
+          <p>
+            A Chiller Peças atua exclusivamente no segmento <strong>business-to-business (B2B)</strong>,
+            tendo como público-alvo pessoas jurídicas e profissionais técnicos qualificados em
+            refrigeração e climatização (engenheiros, instaladores, prestadores de manutenção,
+            distribuidores, integradores).
+          </p>
+          <p class="mt-2">
+            Eventual atendimento a pessoa física é exceção e está sujeito a análise comercial. As
+            peças comercializadas exigem instalação e operação por profissional habilitado; a
+            Chiller Peças não se responsabiliza por uso indevido por pessoas sem capacitação técnica.
+          </p>
+        </section>
+
+        <section aria-labelledby="t5">
+          <h2 id="t5" class="font-display text-2xl text-brand-900 uppercase tracking-tight mb-3">5 · Propriedade intelectual</h2>
+          <p>
+            Marca, logotipo, conteúdo textual, imagens, fotografias, diagramas, código-fonte e
+            metadados estruturados (JSON-LD) são propriedade da Chiller Peças ou estão devidamente
+            licenciados, protegidos pela Lei 9.610/1998 (Direitos Autorais) e Lei 9.279/1996
+            (Propriedade Industrial).
+          </p>
+          <p class="mt-2">
+            <strong>Marcas de terceiros</strong> (Carrier, Trane, York, Copeland, Hitachi, Chemours,
+            Bitzer, Danfoss, Emerson e demais) citadas no site são propriedade de seus respectivos
+            titulares. Sua menção é meramente referencial, indicando compatibilidade técnica das
+            peças, sem implicar em afiliação, parceria, endosso ou representação oficial dessas
+            marcas pela Chiller Peças.
+          </p>
+        </section>
+
+        <section aria-labelledby="t6">
+          <h2 id="t6" class="font-display text-2xl text-brand-900 uppercase tracking-tight mb-3">6 · Limitação de responsabilidade</h2>
+          <ul class="list-disc pl-6 space-y-2">
+            <li>Empenhamo-nos para manter o site disponível em regime de "best-effort", mas <strong>não garantimos disponibilidade 24/7</strong>; manutenções programadas podem ocorrer.</li>
+            <li>As informações de catálogo, preços e prazos têm caráter indicativo. Valores e condições só são vinculantes mediante proposta formal por escrito.</li>
+            <li>Não nos responsabilizamos por perdas decorrentes de uso indevido, instalação inadequada ou operação por pessoal não qualificado das peças vendidas.</li>
+            <li>Eventuais inexatidões serão corrigidas em prazo razoável após comunicação.</li>
+          </ul>
+        </section>
+
+        <section aria-labelledby="t7">
+          <h2 id="t7" class="font-display text-2xl text-brand-900 uppercase tracking-tight mb-3">7 · Comunicações comerciais</h2>
+          <p>
+            Ao enviar dados via formulário de cotação, você autoriza a Chiller Peças a entrar em
+            contato pelos canais informados (WhatsApp, telefone, e-mail) <strong>nos horários
+            comerciais</strong> declarados no site:
+          </p>
+          <p class="mt-2 text-sm bg-brand-light/60 p-3 rounded">
+            {site.horario}
+          </p>
+          <p class="mt-2">
+            Você pode revogar esse consentimento a qualquer momento conforme a
+            <a href="/privacidade" class="text-brand-500 underline underline-offset-2 hover:text-brand-900">Política de Privacidade</a>.
+          </p>
+        </section>
+
+        <section aria-labelledby="t8">
+          <h2 id="t8" class="font-display text-2xl text-brand-900 uppercase tracking-tight mb-3">8 · Privacidade e proteção de dados</h2>
+          <p>
+            O tratamento de seus dados pessoais é regido pela nossa
+            <a href="/privacidade" class="text-brand-500 underline underline-offset-2 hover:text-brand-900">Política de Privacidade</a>,
+            em conformidade com a Lei 13.709/2018 (LGPD), parte integrante destes Termos.
+          </p>
+        </section>
+
+        <section aria-labelledby="t9">
+          <h2 id="t9" class="font-display text-2xl text-brand-900 uppercase tracking-tight mb-3">9 · Acessibilidade</h2>
+          <p>
+            Empenhamo-nos em manter o site em conformidade com as diretrizes WCAG 2.1 nível AA.
+            Detalhes e canal de feedback em
+            <a href="/acessibilidade" class="text-brand-500 underline underline-offset-2 hover:text-brand-900">Acessibilidade</a>.
+          </p>
+        </section>
+
+        <section aria-labelledby="t10">
+          <h2 id="t10" class="font-display text-2xl text-brand-900 uppercase tracking-tight mb-3">10 · Foro e legislação aplicável</h2>
+          <p>
+            Estes Termos são regidos pela legislação brasileira. Fica eleito o foro da Comarca de
+            São Paulo/SP para dirimir quaisquer controvérsias decorrentes destes Termos ou do uso
+            do site, com renúncia expressa a qualquer outro, por mais privilegiado que seja.
+          </p>
+        </section>
+      </div>
+
+      <footer class="mt-12 pt-8 border-t border-brand-light text-sm font-sans text-brand-900/50">
+        <p>
+          <a href="/" class="text-brand-500 hover:text-brand-900 underline underline-offset-2">← Voltar para o início</a>
+          <span aria-hidden="true"> · </span>
+          <a href="/privacidade" class="text-brand-500 hover:text-brand-900 underline underline-offset-2">Política de Privacidade</a>
+          <span aria-hidden="true"> · </span>
+          <a href="/acessibilidade" class="text-brand-500 hover:text-brand-900 underline underline-offset-2">Acessibilidade</a>
+        </p>
+      </footer>
+    </article>
+  </main>
+</BaseLayout>

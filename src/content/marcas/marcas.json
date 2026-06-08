@@ -1,0 +1,10 @@
+[
+  { "id": "carrier", "nome": "Carrier" },
+  { "id": "trane", "nome": "Trane" },
+  { "id": "york", "nome": "York" },
+  { "id": "copeland", "nome": "Copeland" },
+  { "id": "hitachi", "nome": "Hitachi" },
+  { "id": "chemours", "nome": "Chemours" },
+  { "id": "bitzer", "nome": "Bitzer" },
+  { "id": "danfoss", "nome": "Danfoss" }
+]

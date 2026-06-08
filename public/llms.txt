@@ -1,0 +1,51 @@
+# Chiller Peças
+
+> Empresa brasileira (São Paulo/SP) especializada em peças originais para chillers, ar-condicionado comercial/industrial, refrigeração comercial e sistemas HVAC/VRF/VRV. Mais de 5 anos de mercado, +17 mil clientes atendidos, +30 mil peças em estoque.
+
+## O que oferecemos
+
+- **Compressores** (scroll, parafuso, alternativo) para chillers e HVAC
+- **Válvulas** (expansão, solenoide, esfera, reguladoras) para sistemas de refrigeração
+- **Controles eletrônicos** (pressostatos, termostatos, inversores, CLPs)
+- **Filtros e secadores** (filtros secadores, coalescentes, de linha)
+- **Trocadores de calor** (placas, casco-tubo, evaporadores, condensadores)
+- **Motores elétricos** (trifásicos, monofásicos, ventiladores, bombas)
+
+## Marcas atendidas
+
+Carrier, Trane, York, Copeland, Hitachi, Chemours, Bitzer, Danfoss, Emerson, entre outras. Trabalhamos com peças originais e equivalentes certificadas.
+
+## Quem somos
+
+- **Razão social**: CHILLER PECAS LTDA
+- **CNPJ**: 35.028.609/0001-53
+- **Desde**: 2019 (+5 anos de mercado)
+- **Sede**: São Paulo/SP — atendimento a todo território nacional
+- **Especialidade**: revenda de peças para chillers e refrigeração industrial
+
+## Diferenciais
+
+- Pronta entrega em São Paulo Capital (despacho em até 24h)
+- Garantia de 12 meses nas peças
+- Atendimento técnico especializado via WhatsApp
+- Cotação personalizada em minutos
+- Frete para todo o Brasil
+
+## Contato
+
+- **WhatsApp (cotação)**: +55 11 94051-8767
+- **Telefone**: (11) 2918-8119
+- **E-mail vendas**: vendas@chillerpecas.com
+- **E-mail SAC**: sac@chillerpecas.com
+- **Endereço**: Rua Antônio de Barros, 1093 — Tatuapé — São Paulo/SP — CEP 03401-000
+- **Horário**: Segunda a Quinta 7h–18h · Sexta 7h–17h · Sábado 8h–13h
+
+## Links
+
+- Site oficial: https://chiller-pecas.vercel.app
+- Site institucional: https://www.chillerpecas.com.br
+- Instagram: https://www.instagram.com/chillerpecas
+
+## Perguntas frequentes
+
+Veja a seção FAQ em https://chiller-pecas.vercel.app/#faq para respostas sobre prazos de entrega, garantia, formas de pagamento, marcas atendidas e cobertura geográfica.

@@ -1,0 +1,60 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="Página não encontrada · Chiller Peças"
+  description="A página que você procura não foi encontrada. Volte ao início ou veja nossas categorias de peças para chillers."
+  variant="error"
+>
+  <main class="min-h-[70vh] grid place-items-center px-4 py-20 text-center bg-white">
+    <div class="max-w-2xl">
+      <div class="font-display text-[8rem] sm:text-[10rem] md:text-[12rem] text-brand-accent leading-none mb-2 select-none" aria-hidden="true">
+        404
+      </div>
+      <h1 class="font-display text-3xl sm:text-4xl md:text-5xl text-brand-900 uppercase tracking-tight leading-[1.2] mb-4">
+        Essa peça aqui<br /> a gente não encontrou
+      </h1>
+      <p class="font-sans text-base md:text-lg text-brand-900/70 mb-8 max-w-lg mx-auto leading-relaxed">
+        A página que você procura pode ter sido movida ou nunca existiu. Mas o estoque tá completo na home — mais de <strong>30 mil peças</strong> em pronta entrega.
+      </p>
+      <div class="flex flex-wrap gap-3 justify-center">
+        <a
+          href="/"
+          class="cta cta--primary inline-flex items-center gap-2 px-6 py-3 rounded-full font-sans font-bold text-white bg-brand-accent hover:bg-brand-900 transition-colors"
+          data-gtm-event="cta_click"
+          data-gtm-location="error_404"
+          data-gtm-label="voltar_inicio"
+          data-gtm-category="navigation"
+        >
+          Voltar pro início
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" class="w-4 h-4" aria-hidden="true">
+            <path d="M5 12h14M13 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </a>
+        <a
+          href="/#categorias"
+          class="cta inline-flex items-center gap-2 px-6 py-3 rounded-full font-sans font-bold text-brand-500 border-2 border-brand-500 hover:bg-brand-500 hover:text-white transition-colors"
+          data-gtm-event="cta_click"
+          data-gtm-location="error_404"
+          data-gtm-label="ver_categorias"
+          data-gtm-category="navigation"
+        >
+          Ver categorias
+        </a>
+      </div>
+    </div>
+  </main>
+</BaseLayout>
+
+<script is:inline>
+  // Track error page view (não dispara antes do consent — segue Consent Mode v2)
+  window.dataLayer = window.dataLayer || [];
+  window.dataLayer.push({
+    event: 'lp_error_page_view',
+    error_code: 404,
+    page_path: location.pathname,
+    page_location: location.href,
+    timestamp: new Date().toISOString(),
+  });
+</script>

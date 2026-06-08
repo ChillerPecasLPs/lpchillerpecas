@@ -1,0 +1,223 @@
+---
+/**
+ * Banner de consentimento LGPD + Google Ads Consent Mode v2.
+ *
+ * Comportamento:
+ *   - Aparece na 1ª visita (sem `cp_consent` ou versão diferente)
+ *   - 3 botões: Apenas essenciais · Configurar · Aceitar todos
+ *   - "Configurar" abre <dialog> com 3 toggles granulares (analytics, marketing, personalização)
+ *   - Persiste decisão em localStorage `cp_consent` com versão (re-consent se versão mudar)
+ *   - Dispara gtag('consent','update',...) — alimenta GTM/GA/Ads em tempo real
+ *   - Não recarrega a página, sem flicker
+ */
+---
+
+<div
+  id="consent-banner"
+  class="consent-banner"
+  hidden
+  role="region"
+  aria-label="Aviso de cookies e privacidade"
+>
+  <div class="consent-banner__inner">
+    <div class="consent-banner__text">
+      <strong class="consent-banner__title">Sua privacidade importa</strong>
+      <p class="consent-banner__desc">
+        Usamos cookies para entregar a melhor experiência e medir o desempenho de
+        campanhas. Você pode aceitar todos, manter apenas os essenciais ou
+        configurar individualmente.
+        <a href="/privacidade" target="_blank" rel="noopener">Saiba mais</a>.
+      </p>
+    </div>
+    <div class="consent-banner__actions">
+      <button type="button" class="consent-banner__btn consent-banner__btn--ghost" data-consent-action="essential">
+        Apenas essenciais
+      </button>
+      <button type="button" class="consent-banner__btn consent-banner__btn--secondary" data-consent-action="configure">
+        Configurar
+      </button>
+      <button type="button" class="consent-banner__btn consent-banner__btn--primary" data-consent-action="all">
+        Aceitar todos
+      </button>
+    </div>
+  </div>
+</div>
+
+<dialog id="consent-config" class="consent-config" aria-labelledby="consent-config-title">
+  <form method="dialog" class="consent-config__form" id="consent-config-form">
+    <button type="button" class="consent-config__close" aria-label="Fechar" data-consent-action="close-config">×</button>
+    <h2 id="consent-config-title">Suas preferências de cookies</h2>
+    <p class="consent-config__desc">
+      Marque as categorias que você aceita. Cookies necessários estão sempre ativos
+      pois são imprescindíveis para o funcionamento do site.
+    </p>
+
+    <fieldset class="consent-config__group">
+      <div class="consent-config__row">
+        <input id="ck-necessary" type="checkbox" checked disabled />
+        <label for="ck-necessary">
+          <strong>Necessários</strong>
+          <span>Sempre ativos · Funcionamento básico, segurança e gravação da sua decisão de cookies.</span>
+        </label>
+      </div>
+
+      <div class="consent-config__row">
+        <input id="ck-analytics" type="checkbox" name="analytics" />
+        <label for="ck-analytics">
+          <strong>Analíticos</strong>
+          <span>Google Analytics e Microsoft Clarity. Permitem entender como o site é usado para melhorá-lo.</span>
+        </label>
+      </div>
+
+      <div class="consent-config__row">
+        <input id="ck-marketing" type="checkbox" name="marketing" />
+        <label for="ck-marketing">
+          <strong>Marketing</strong>
+          <span>Google Ads e remarketing. Permitem mensurar conversões e exibir anúncios relevantes.</span>
+        </label>
+      </div>
+
+      <div class="consent-config__row">
+        <input id="ck-personalization" type="checkbox" name="personalization" />
+        <label for="ck-personalization">
+          <strong>Personalização</strong>
+          <span>Adapta a experiência a perfis e preferências de navegação.</span>
+        </label>
+      </div>
+    </fieldset>
+
+    <div class="consent-config__footer">
+      <button type="button" class="consent-banner__btn consent-banner__btn--ghost" data-consent-action="close-config">
+        Cancelar
+      </button>
+      <button type="submit" class="consent-banner__btn consent-banner__btn--primary" data-consent-action="save-config">
+        Salvar preferências
+      </button>
+    </div>
+  </form>
+</dialog>
+
+<script is:inline>
+  (function () {
+    const BANNER_VERSION = 1;
+    const KEY = 'cp_consent';
+
+    const banner = document.getElementById('consent-banner');
+    const dialog = document.getElementById('consent-config');
+    const form = document.getElementById('consent-config-form');
+    const ckAnalytics = document.getElementById('ck-analytics');
+    const ckMarketing = document.getElementById('ck-marketing');
+    const ckPersonalization = document.getElementById('ck-personalization');
+    if (!banner || !dialog || !form || !ckAnalytics || !ckMarketing || !ckPersonalization) return;
+
+    function readConsent() {
+      try {
+        const data = JSON.parse(localStorage.getItem(KEY) || 'null');
+        if (!data || data.version !== BANNER_VERSION) return null;
+        return data;
+      } catch { return null; }
+    }
+
+    function writeConsent(choices) {
+      const payload = {
+        version: BANNER_VERSION,
+        choices,
+        ts: new Date().toISOString(),
+      };
+      try { localStorage.setItem(KEY, JSON.stringify(payload)); } catch {}
+    }
+
+    function applyConsent(choices, source) {
+      // Update Consent Mode v2
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){ window.dataLayer.push(arguments); }
+      gtag('consent', 'update', {
+        ad_storage: choices.marketing ? 'granted' : 'denied',
+        ad_user_data: choices.marketing ? 'granted' : 'denied',
+        ad_personalization: choices.personalization ? 'granted' : 'denied',
+        analytics_storage: choices.analytics ? 'granted' : 'denied',
+      });
+      // Track decision (não dispara antes do consent porque GA4/Ads respeitam o stub)
+      window.dataLayer.push({
+        event: 'lp_consent_decision',
+        timestamp: new Date().toISOString(),
+        consent_source: source || 'banner',
+        consent_analytics: choices.analytics ? 'granted' : 'denied',
+        consent_marketing: choices.marketing ? 'granted' : 'denied',
+        consent_personalization: choices.personalization ? 'granted' : 'denied',
+      });
+    }
+
+    function showBanner() {
+      banner.hidden = false;
+      // pequena animação slide-up via CSS class
+      requestAnimationFrame(() => banner.classList.add('is-open'));
+    }
+
+    function hideBanner() {
+      banner.classList.remove('is-open');
+      // depois do transition, esconde do AT
+      setTimeout(() => { banner.hidden = true; }, 220);
+    }
+
+    function openConfig() {
+      // Pre-popula com decisão atual (se existe)
+      const current = readConsent();
+      if (current) {
+        ckAnalytics.checked = !!current.choices.analytics;
+        ckMarketing.checked = !!current.choices.marketing;
+        ckPersonalization.checked = !!current.choices.personalization;
+      }
+      try { dialog.showModal(); } catch { dialog.setAttribute('open', ''); }
+    }
+
+    function closeConfig() {
+      try { dialog.close(); } catch { dialog.removeAttribute('open'); }
+    }
+
+    function saveAll() {
+      const choices = { analytics: true, marketing: true, personalization: true };
+      writeConsent(choices);
+      applyConsent(choices, 'accept_all');
+      hideBanner();
+    }
+
+    function saveEssential() {
+      const choices = { analytics: false, marketing: false, personalization: false };
+      writeConsent(choices);
+      applyConsent(choices, 'essential_only');
+      hideBanner();
+    }
+
+    function saveConfig(ev) {
+      ev.preventDefault();
+      const choices = {
+        analytics: ckAnalytics.checked,
+        marketing: ckMarketing.checked,
+        personalization: ckPersonalization.checked,
+      };
+      writeConsent(choices);
+      applyConsent(choices, 'configure');
+      closeConfig();
+      hideBanner();
+    }
+
+    // Wire actions
+    document.querySelectorAll('[data-consent-action]').forEach((el) => {
+      const action = el.getAttribute('data-consent-action');
+      if (action === 'all') el.addEventListener('click', saveAll);
+      else if (action === 'essential') el.addEventListener('click', saveEssential);
+      else if (action === 'configure') el.addEventListener('click', openConfig);
+      else if (action === 'close-config') el.addEventListener('click', closeConfig);
+    });
+    form.addEventListener('submit', saveConfig);
+
+    // Boot — se já tem decisão válida, aplica silenciosamente; senão, mostra banner após 200ms
+    const existing = readConsent();
+    if (existing) {
+      applyConsent(existing.choices, 'restored');
+    } else {
+      setTimeout(showBanner, 200);
+    }
+  })();
+</script>

@@ -1,0 +1,253 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getEntry } from 'astro:content';
+
+const site = (await getEntry('site', 'config'))!.data;
+const POLITICA_VERSAO = '1.0';
+const POLITICA_DATA = '30/04/2026';
+---
+
+<BaseLayout
+  title="Política de Privacidade · Chiller Peças"
+  description="Como a Chiller Peças coleta, usa e protege seus dados pessoais conforme a Lei 13.709/2018 (LGPD)."
+  variant="legal"
+>
+  <main class="bg-white">
+    <article class="max-w-3xl mx-auto px-4 md:px-8 py-12 md:py-20">
+      <header class="mb-10">
+        <p class="font-sans text-xs uppercase tracking-[0.25em] text-brand-500 font-bold mb-3">
+          Documento legal
+        </p>
+        <h1 class="font-display text-4xl md:text-5xl text-brand-900 leading-[0.95] tracking-tight mb-3">
+          Política de Privacidade
+        </h1>
+        <p class="font-sans text-sm text-brand-900/60">
+          Versão {POLITICA_VERSAO} · Atualizada em {POLITICA_DATA}
+        </p>
+      </header>
+
+      <div class="space-y-10 font-sans text-brand-900/85 leading-relaxed">
+
+        <section aria-labelledby="s1">
+          <h2 id="s1" class="font-display text-2xl text-brand-900 uppercase tracking-tight mb-3">1 · Quem é o controlador dos dados</h2>
+          <address class="not-italic bg-brand-light/60 p-4 rounded-lg text-sm leading-relaxed">
+            <strong>{site.empresa.razaoSocial}</strong><br />
+            CNPJ {site.empresa.cnpj}<br />
+            {site.endereco.rua} · {site.endereco.bairro}<br />
+            {site.endereco.cidade}/{site.endereco.estado} · CEP {site.endereco.cep}
+          </address>
+        </section>
+
+        <section aria-labelledby="s2">
+          <h2 id="s2" class="font-display text-2xl text-brand-900 uppercase tracking-tight mb-3">2 · Encarregado pelo Tratamento (DPO)</h2>
+          <p>
+            Para qualquer dúvida ou exercício de direitos sobre seus dados pessoais, entre em contato:
+          </p>
+          <ul class="list-none mt-3 space-y-1">
+            <li><strong>E-mail:</strong> <a href={`mailto:${site.email}`} class="text-brand-500 underline underline-offset-2 hover:text-brand-900">{site.email}</a></li>
+            <li><strong>Telefone:</strong> <a href={`tel:${site.telefone.replace(/\D/g, '')}`} class="text-brand-500 underline underline-offset-2 hover:text-brand-900">{site.telefone}</a></li>
+          </ul>
+        </section>
+
+        <section aria-labelledby="s3">
+          <h2 id="s3" class="font-display text-2xl text-brand-900 uppercase tracking-tight mb-3">3 · Dados pessoais que coletamos</h2>
+          <p>Coletamos os seguintes dados:</p>
+          <div class="overflow-x-auto mt-3 mb-2">
+            <table class="w-full text-sm border-collapse">
+              <thead>
+                <tr class="bg-brand-light/60">
+                  <th class="text-left p-3 border border-brand-light">Categoria</th>
+                  <th class="text-left p-3 border border-brand-light">Dados</th>
+                  <th class="text-left p-3 border border-brand-light">Como coletado</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td class="p-3 border border-brand-light">Cadastrais</td><td class="p-3 border border-brand-light">Telefone (E.164)</td><td class="p-3 border border-brand-light">Formulário de cotação (consentimento)</td></tr>
+                <tr><td class="p-3 border border-brand-light">Navegação</td><td class="p-3 border border-brand-light">IP, user-agent, viewport, idioma</td><td class="p-3 border border-brand-light">Automático (cookies técnicos)</td></tr>
+                <tr><td class="p-3 border border-brand-light">Comportamento</td><td class="p-3 border border-brand-light">Páginas vistas, cliques, tempo, scroll</td><td class="p-3 border border-brand-light">Cookies analíticos (se consentidos)</td></tr>
+                <tr><td class="p-3 border border-brand-light">Atribuição</td><td class="p-3 border border-brand-light">UTM, gclid, fbclid, referrer</td><td class="p-3 border border-brand-light">Automático (localStorage)</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="text-sm text-brand-900/60">Não coletamos dados sensíveis (saúde, religião, biometria, etnia) nem dados de menores de idade.</p>
+        </section>
+
+        <section aria-labelledby="s4">
+          <h2 id="s4" class="font-display text-2xl text-brand-900 uppercase tracking-tight mb-3">4 · Finalidade do tratamento</h2>
+          <ul class="list-disc pl-6 space-y-1">
+            <li>Atender solicitação de cotação e contato comercial</li>
+            <li>Enviar propostas e responder dúvidas técnicas</li>
+            <li>Métricas agregadas de campanha e otimização do site</li>
+            <li>Prevenção de fraudes e segurança</li>
+            <li>Cumprimento de obrigações legais e regulatórias</li>
+          </ul>
+        </section>
+
+        <section aria-labelledby="s5">
+          <h2 id="s5" class="font-display text-2xl text-brand-900 uppercase tracking-tight mb-3">5 · Base legal (LGPD art. 7º)</h2>
+          <ul class="list-disc pl-6 space-y-2">
+            <li><strong>Art. 7º, V</strong> — Execução de procedimentos preliminares ao contrato (responder cotações)</li>
+            <li><strong>Art. 7º, IX</strong> — Legítimo interesse (métricas agregadas, prevenção de fraude)</li>
+            <li><strong>Art. 7º, I</strong> — Consentimento (cookies de marketing/personalização)</li>
+            <li><strong>Art. 7º, II</strong> — Cumprimento de obrigação legal/regulatória</li>
+          </ul>
+        </section>
+
+        <section aria-labelledby="s6">
+          <h2 id="s6" class="font-display text-2xl text-brand-900 uppercase tracking-tight mb-3">6 · Compartilhamento com operadores</h2>
+          <p>Compartilhamos dados com as seguintes plataformas, exclusivamente para as finalidades descritas:</p>
+          <div class="overflow-x-auto mt-3">
+            <table class="w-full text-sm border-collapse">
+              <thead>
+                <tr class="bg-brand-light/60">
+                  <th class="text-left p-3 border border-brand-light">Operador</th>
+                  <th class="text-left p-3 border border-brand-light">Finalidade</th>
+                  <th class="text-left p-3 border border-brand-light">País</th>
+                  <th class="text-left p-3 border border-brand-light">Garantias</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td class="p-3 border border-brand-light">Hablla</td><td class="p-3 border border-brand-light">CRM/automação WhatsApp</td><td class="p-3 border border-brand-light">Brasil</td><td class="p-3 border border-brand-light">DPA, TLS</td></tr>
+                <tr><td class="p-3 border border-brand-light">Google (Analytics, Ads, GTM)</td><td class="p-3 border border-brand-light">Métricas + remarketing</td><td class="p-3 border border-brand-light">EUA</td><td class="p-3 border border-brand-light">Cláusulas-padrão, IP anônimo</td></tr>
+                <tr><td class="p-3 border border-brand-light">Microsoft Clarity</td><td class="p-3 border border-brand-light">Session replay anonimizado</td><td class="p-3 border border-brand-light">EUA</td><td class="p-3 border border-brand-light">DPA, mascaramento de PII</td></tr>
+                <tr><td class="p-3 border border-brand-light">Vercel</td><td class="p-3 border border-brand-light">Hospedagem do site</td><td class="p-3 border border-brand-light">EUA</td><td class="p-3 border border-brand-light">DPA, TLS, logs efêmeros</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section aria-labelledby="s7">
+          <h2 id="s7" class="font-display text-2xl text-brand-900 uppercase tracking-tight mb-3">7 · Transferência internacional de dados</h2>
+          <p>
+            Parte dos operadores acima (Google, Microsoft, Vercel) processa dados em servidores
+            localizados nos Estados Unidos. Essa transferência ocorre com base nas
+            <strong> cláusulas contratuais-padrão</strong> aprovadas pela ANPD e nos compromissos
+            do <em>Data Privacy Framework</em>. Asseguramos nível de proteção adequado conforme
+            art. 33 da LGPD.
+          </p>
+        </section>
+
+        <section aria-labelledby="s8">
+          <h2 id="s8" class="font-display text-2xl text-brand-900 uppercase tracking-tight mb-3">8 · Cookies utilizados</h2>
+          <p>Inventário completo dos cookies e armazenamento local:</p>
+          <div class="overflow-x-auto mt-3">
+            <table class="w-full text-xs sm:text-sm border-collapse">
+              <thead>
+                <tr class="bg-brand-light/60">
+                  <th class="text-left p-2 border border-brand-light">Nome</th>
+                  <th class="text-left p-2 border border-brand-light">Provedor</th>
+                  <th class="text-left p-2 border border-brand-light">Categoria</th>
+                  <th class="text-left p-2 border border-brand-light">Finalidade</th>
+                  <th class="text-left p-2 border border-brand-light">Duração</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td class="p-2 border border-brand-light"><code>cp_first_touch</code></td><td class="p-2 border border-brand-light">Próprio</td><td class="p-2 border border-brand-light">Funcional</td><td class="p-2 border border-brand-light">First-touch attribution</td><td class="p-2 border border-brand-light">365 dias</td></tr>
+                <tr><td class="p-2 border border-brand-light"><code>cp_last_touch</code></td><td class="p-2 border border-brand-light">Próprio</td><td class="p-2 border border-brand-light">Funcional</td><td class="p-2 border border-brand-light">Last-touch attribution</td><td class="p-2 border border-brand-light">365 dias</td></tr>
+                <tr><td class="p-2 border border-brand-light"><code>cp_session</code></td><td class="p-2 border border-brand-light">Próprio</td><td class="p-2 border border-brand-light">Funcional</td><td class="p-2 border border-brand-light">ID de sessão</td><td class="p-2 border border-brand-light">Sessão</td></tr>
+                <tr><td class="p-2 border border-brand-light"><code>cp_consent</code></td><td class="p-2 border border-brand-light">Próprio</td><td class="p-2 border border-brand-light">Necessário</td><td class="p-2 border border-brand-light">Decisão de cookies</td><td class="p-2 border border-brand-light">365 dias</td></tr>
+                <tr><td class="p-2 border border-brand-light"><code>cp_pending_leads</code></td><td class="p-2 border border-brand-light">Próprio</td><td class="p-2 border border-brand-light">Funcional</td><td class="p-2 border border-brand-light">Fila offline de leads</td><td class="p-2 border border-brand-light">24 horas</td></tr>
+                <tr><td class="p-2 border border-brand-light"><code>_ga</code>, <code>_ga_*</code></td><td class="p-2 border border-brand-light">Google</td><td class="p-2 border border-brand-light">Analítico</td><td class="p-2 border border-brand-light">Identificador GA4</td><td class="p-2 border border-brand-light">2 anos</td></tr>
+                <tr><td class="p-2 border border-brand-light"><code>_gcl_au</code>, <code>_gcl_aw</code></td><td class="p-2 border border-brand-light">Google</td><td class="p-2 border border-brand-light">Marketing</td><td class="p-2 border border-brand-light">Conversões Google Ads</td><td class="p-2 border border-brand-light">90 dias</td></tr>
+                <tr><td class="p-2 border border-brand-light"><code>_clck</code>, <code>_clsk</code></td><td class="p-2 border border-brand-light">Microsoft</td><td class="p-2 border border-brand-light">Analítico</td><td class="p-2 border border-brand-light">Clarity session replay</td><td class="p-2 border border-brand-light">1 ano</td></tr>
+                <tr><td class="p-2 border border-brand-light"><code>IDE</code>, <code>test_cookie</code></td><td class="p-2 border border-brand-light">DoubleClick</td><td class="p-2 border border-brand-light">Marketing</td><td class="p-2 border border-brand-light">Remarketing</td><td class="p-2 border border-brand-light">1 ano</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="text-sm mt-3">
+            Você pode gerenciar suas preferências a qualquer momento pelo banner de cookies do
+            site ou nas configurações do seu navegador.
+          </p>
+        </section>
+
+        <section aria-labelledby="s9">
+          <h2 id="s9" class="font-display text-2xl text-brand-900 uppercase tracking-tight mb-3">9 · Tempo de retenção</h2>
+          <ul class="list-disc pl-6 space-y-1">
+            <li><strong>Leads ativos</strong>: até 2 anos após a última interação</li>
+            <li><strong>Logs analíticos agregados</strong>: 14 meses</li>
+            <li><strong>Backups operacionais</strong>: 90 dias</li>
+            <li><strong>Dados retidos por obrigação legal</strong>: pelo prazo determinado pela legislação aplicável</li>
+          </ul>
+        </section>
+
+        <section aria-labelledby="s10">
+          <h2 id="s10" class="font-display text-2xl text-brand-900 uppercase tracking-tight mb-3">10 · Direitos do titular (LGPD art. 18)</h2>
+          <p>Você tem direito a, mediante requisição:</p>
+          <ul class="list-disc pl-6 space-y-1">
+            <li>Confirmar a existência de tratamento</li>
+            <li>Acessar seus dados</li>
+            <li>Corrigir dados incompletos, inexatos ou desatualizados</li>
+            <li>Solicitar anonimização, bloqueio ou eliminação de dados desnecessários</li>
+            <li>Solicitar portabilidade dos dados</li>
+            <li>Eliminar dados tratados com base em consentimento</li>
+            <li>Obter informação sobre compartilhamento</li>
+            <li>Ser informado sobre as consequências de não consentir</li>
+            <li>Revogar o consentimento a qualquer tempo</li>
+          </ul>
+          <p class="mt-3">
+            Solicite via <a href={`mailto:${site.email}`} class="text-brand-500 underline underline-offset-2 hover:text-brand-900">{site.email}</a>.
+            Responderemos em até <strong>15 dias</strong> conforme exigido pela LGPD.
+          </p>
+        </section>
+
+        <section aria-labelledby="s11">
+          <h2 id="s11" class="font-display text-2xl text-brand-900 uppercase tracking-tight mb-3">11 · Segurança da informação</h2>
+          <p>Adotamos medidas técnicas e administrativas adequadas:</p>
+          <ul class="list-disc pl-6 space-y-1">
+            <li>Criptografia em trânsito (TLS 1.2+)</li>
+            <li>Controle de acesso por função e princípio do menor privilégio</li>
+            <li>Logs de auditoria e monitoramento contínuo</li>
+            <li>Plano de resposta a incidentes de segurança</li>
+            <li>Notificação à ANPD em até 72h em caso de incidente, conforme art. 48 da LGPD</li>
+          </ul>
+        </section>
+
+        <section aria-labelledby="s12">
+          <h2 id="s12" class="font-display text-2xl text-brand-900 uppercase tracking-tight mb-3">12 · Decisões automatizadas</h2>
+          <p>
+            Este site <strong>não realiza decisões automatizadas individuais</strong> que afetem
+            o titular dos dados. Há apenas automação de roteamento de leads para atendimento humano,
+            sem efeitos jurídicos ou de credit scoring sobre o titular (art. 20 da LGPD).
+          </p>
+        </section>
+
+        <section aria-labelledby="s13">
+          <h2 id="s13" class="font-display text-2xl text-brand-900 uppercase tracking-tight mb-3">13 · Crianças e adolescentes</h2>
+          <p>
+            Este serviço é destinado a empresas (B2B) e profissionais técnicos. Não direcionamos
+            comunicação a menores de 18 anos e não coletamos conscientemente dados de crianças
+            ou adolescentes. Caso identifique tratamento indevido, entre em contato com nosso DPO.
+          </p>
+        </section>
+
+        <section aria-labelledby="s14">
+          <h2 id="s14" class="font-display text-2xl text-brand-900 uppercase tracking-tight mb-3">14 · Atualizações desta política</h2>
+          <p>
+            Reservamos o direito de revisar esta política. Mudanças relevantes serão sinalizadas
+            no banner de cookies (re-consentimento) ou por aviso no topo desta página. Sempre
+            verifique a versão e data informadas no início do documento.
+          </p>
+        </section>
+
+        <section aria-labelledby="s15">
+          <h2 id="s15" class="font-display text-2xl text-brand-900 uppercase tracking-tight mb-3">15 · Foro e legislação aplicável</h2>
+          <p>
+            Esta política é regida pela legislação brasileira, em especial a Lei 13.709/2018
+            (LGPD). Fica eleito o foro da Comarca de São Paulo/SP para dirimir qualquer
+            controvérsia.
+          </p>
+        </section>
+      </div>
+
+      <footer class="mt-12 pt-8 border-t border-brand-light text-sm font-sans text-brand-900/50">
+        <p>
+          <a href="/" class="text-brand-500 hover:text-brand-900 underline underline-offset-2">← Voltar para o início</a>
+          <span aria-hidden="true"> · </span>
+          <a href="/termos" class="text-brand-500 hover:text-brand-900 underline underline-offset-2">Termos de uso</a>
+          <span aria-hidden="true"> · </span>
+          <a href="/acessibilidade" class="text-brand-500 hover:text-brand-900 underline underline-offset-2">Acessibilidade</a>
+        </p>
+      </footer>
+    </article>
+  </main>
+</BaseLayout>

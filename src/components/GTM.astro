@@ -1,0 +1,25 @@
+---
+/**
+ * Google Tag Manager injector.
+ *
+ * Usage:
+ *   <GTMHead id={site.tracking.gtmId} />   ← no <head>, antes de outras tags
+ *   <GTMBody id={site.tracking.gtmId} />   ← primeiro filho do <body>
+ *
+ * Este arquivo exporta apenas o HEAD. Use `GTMNoscript.astro` para o body.
+ * Se id vazio, não renderiza nada.
+ */
+interface Props {
+  id?: string;
+}
+const { id } = Astro.props;
+---
+{id && (
+  <script is:inline set:html={`
+    (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','${id}');
+  `} />
+)}

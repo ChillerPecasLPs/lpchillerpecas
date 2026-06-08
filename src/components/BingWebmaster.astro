@@ -1,0 +1,11 @@
+---
+/**
+ * Bing Webmaster Tools — meta tag de verificação.
+ * Pegue o valor em www.bing.com/webmasters.
+ */
+interface Props {
+  token?: string;
+}
+const { token } = Astro.props;
+---
+{token && <meta name="msvalidate.01" content={token} />}

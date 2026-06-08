@@ -1,0 +1,27 @@
+---
+/**
+ * Google Analytics 4 via gtag.js (modo direto, sem GTM).
+ *
+ * Útil quando:
+ *   - Você quer debugar GA4 isolado de GTM
+ *   - GTM ainda não foi criado mas você já quer coletar dados
+ *
+ * Recomendação: se `gtmId` estiver configurado no site, configure a tag
+ * GA4 dentro do GTM e deixe este `measurementId` VAZIO para evitar double-fire.
+ */
+interface Props {
+  measurementId?: string;
+}
+const { measurementId } = Astro.props;
+---
+{measurementId && (
+  <>
+    <script is:inline async src={`https://www.googletagmanager.com/gtag/js?id=${measurementId}`}></script>
+    <script is:inline set:html={`
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', '${measurementId}', { anonymize_ip: true });
+    `} />
+  </>
+)}

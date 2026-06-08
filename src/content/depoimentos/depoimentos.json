@@ -1,0 +1,20 @@
+[
+  {
+    "id": "1",
+    "nome": "Rayssa Andrade",
+    "empresa": "Avaliação Google",
+    "texto": "Atendimento ótimo! Um agradecimento especial ao Vitor que tirou todas as minhas dúvidas, e foi super educado. Recomendo a empresa!"
+  },
+  {
+    "id": "2",
+    "nome": "Hélder Marcos Silva",
+    "empresa": "Avaliação Google",
+    "texto": "Excelente atendimento. Prestatividade, rapidez e ética. Muito satisfeito. Com certeza a partir de agora já é um dos fornecedores estratégicos de nossa empresa."
+  },
+  {
+    "id": "3",
+    "nome": "Aline Cursino de Paula Marques",
+    "empresa": "Avaliação Google",
+    "texto": "Gostaria de registrar meu reconhecimento ao excelente trabalho do vendedor Bruno Rodrigues. Ele se destacou pela agilidade, atenção e dedicação durante todas as tratativas. Sua postura profissional fez toda a diferença."
+  }
+]

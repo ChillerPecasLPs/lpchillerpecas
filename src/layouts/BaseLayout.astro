@@ -1,0 +1,343 @@
+---
+import '../styles/global.css';
+import { getEntry, getCollection } from 'astro:content';
+import GTM from '../components/GTM.astro';
+import GTMNoscript from '../components/GTMNoscript.astro';
+import GA4 from '../components/GA4.astro';
+import SearchConsole from '../components/SearchConsole.astro';
+import BingWebmaster from '../components/BingWebmaster.astro';
+import ConsentBanner from '../components/ConsentBanner.astro';
+
+interface Props {
+  title?: string;
+  description?: string;
+  variant?: 'error' | 'legal' | string;
+}
+
+const { title, description, variant } = Astro.props;
+
+// Robots meta condicional por variant
+// - 'error' (404/500) → não indexa páginas de erro
+// - 'legal' (privacidade/termos/acessibilidade) → indexa mas não cacheia
+// - default → SEO completo da landing
+const robotsContent =
+  variant === 'error'
+    ? 'noindex,follow'
+    : variant === 'legal'
+      ? 'index,follow,noarchive'
+      : 'index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1';
+
+const site = await getEntry('site', 'config');
+const s = site!.data;
+
+const categorias = await getCollection('categorias');
+const categoriasOrdenadas = categorias.sort((a, b) => a.data.ordem - b.data.ordem);
+
+let faqEntries: Array<{ pergunta: string; resposta: string }> = [];
+try {
+  const faqAll = await getCollection('faq');
+  faqEntries = faqAll
+    .sort((a, b) => a.data.ordem - b.data.ordem)
+    .map((e) => ({ pergunta: e.data.pergunta, resposta: e.data.resposta }));
+} catch {
+  faqEntries = [];
+}
+
+const pageTitle = title ?? `${s.empresa.nome} — ${s.empresa.tagline}`;
+const pageDescription = description ?? s.empresa.descricao;
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+const siteOrigin = Astro.site?.toString().replace(/\/$/, '') ?? '';
+const ogImageURL = new URL('/og-image.jpg', Astro.site).toString();
+
+const tracking = s.tracking ?? {};
+const gtmId = tracking.gtmId ?? '';
+const ga4Id = tracking.ga4MeasurementId ?? '';
+const gscToken = tracking.googleSiteVerification ?? '';
+const bingToken = tracking.bingSiteVerification ?? '';
+
+const redes = s.redesSociais ?? {};
+const sameAs = [redes.instagram, redes.facebook, redes.linkedin].filter(Boolean);
+
+/* ==========================================================================
+   JSON-LD multi-entidade (@graph) — LocalBusiness, Organization, WebSite,
+   BreadcrumbList, FAQPage, Service×N, AggregateRating
+   ========================================================================== */
+const ORG_ID = `${siteOrigin}/#organization`;
+const BUSINESS_ID = `${siteOrigin}/#localbusiness`;
+const WEBSITE_ID = `${siteOrigin}/#website`;
+
+const organization = {
+  '@type': 'Organization',
+  '@id': ORG_ID,
+  name: s.empresa.nome,
+  legalName: s.empresa.razaoSocial,
+  url: `${siteOrigin}/`,
+  logo: `${siteOrigin}/logo.png`,
+  foundingDate: String(s.empresa.desde),
+  taxID: s.empresa.cnpj,
+  sameAs,
+  contactPoint: [{
+    '@type': 'ContactPoint',
+    telephone: s.telefone,
+    contactType: 'customer service',
+    email: s.email,
+    areaServed: 'BR',
+    availableLanguage: ['Portuguese'],
+  }],
+};
+
+const localBusiness = {
+  '@type': 'LocalBusiness',
+  '@id': BUSINESS_ID,
+  name: s.empresa.nome,
+  description: s.empresa.descricao,
+  telephone: s.telefone,
+  email: s.email,
+  url: `${siteOrigin}/`,
+  image: ogImageURL,
+  logo: `${siteOrigin}/logo.png`,
+  priceRange: '$$',
+  parentOrganization: { '@id': ORG_ID },
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: s.endereco.bairro ? `${s.endereco.rua} — ${s.endereco.bairro}` : s.endereco.rua,
+    addressLocality: s.endereco.cidade,
+    addressRegion: s.endereco.estado,
+    postalCode: s.endereco.cep,
+    addressCountry: 'BR',
+  },
+  geo: {
+    '@type': 'GeoCoordinates',
+    latitude: -23.5414,
+    longitude: -46.5703,
+  },
+  openingHoursSpecification: [
+    { '@type': 'OpeningHoursSpecification', dayOfWeek: ['Monday','Tuesday','Wednesday','Thursday'], opens: '07:00', closes: '18:00' },
+    { '@type': 'OpeningHoursSpecification', dayOfWeek: 'Friday', opens: '07:00', closes: '17:00' },
+    { '@type': 'OpeningHoursSpecification', dayOfWeek: 'Saturday', opens: '08:00', closes: '13:00' },
+  ],
+  areaServed: { '@type': 'Country', name: 'Brasil' },
+  sameAs,
+  aggregateRating: {
+    '@type': 'AggregateRating',
+    ratingValue: '5.0',
+    reviewCount: '480',
+    bestRating: '5',
+    worstRating: '1',
+  },
+  review: [
+    {
+      '@type': 'Review',
+      author: { '@type': 'Person', name: 'Rayssa Andrade' },
+      reviewRating: { '@type': 'Rating', ratingValue: '5', bestRating: '5' },
+      reviewBody: 'Atendimento ótimo! Um agradecimento especial ao Vitor que tirou todas as minhas dúvidas, e foi super educado. Recomendo a empresa!',
+      datePublished: '2026-03-25',
+      publisher: { '@type': 'Organization', name: 'Google' },
+    },
+    {
+      '@type': 'Review',
+      author: { '@type': 'Person', name: 'Hélder Marcos Silva' },
+      reviewRating: { '@type': 'Rating', ratingValue: '5', bestRating: '5' },
+      reviewBody: 'Excelente atendimento. Prestatividade, rapidez e ética. Muito satisfeito. Com certeza a partir de agora já é um dos fornecedores estratégicos de nossa empresa.',
+      datePublished: '2025-11-14',
+      publisher: { '@type': 'Organization', name: 'Google' },
+    },
+    {
+      '@type': 'Review',
+      author: { '@type': 'Person', name: 'Aline Cursino de Paula Marques' },
+      reviewRating: { '@type': 'Rating', ratingValue: '5', bestRating: '5' },
+      reviewBody: 'Gostaria de registrar meu reconhecimento ao excelente trabalho do vendedor Bruno Rodrigues. Ele se destacou pela agilidade, atenção e dedicação durante todas as tratativas. Sua postura profissional fez toda a diferença.',
+      datePublished: '2026-03-01',
+      publisher: { '@type': 'Organization', name: 'Google' },
+    },
+  ],
+};
+
+const website = {
+  '@type': 'WebSite',
+  '@id': WEBSITE_ID,
+  url: `${siteOrigin}/`,
+  name: s.empresa.nome,
+  inLanguage: 'pt-BR',
+  publisher: { '@id': ORG_ID },
+  potentialAction: {
+    '@type': 'SearchAction',
+    target: `${siteOrigin}/?q={search_term_string}`,
+    'query-input': 'required name=search_term_string',
+  },
+};
+
+const breadcrumb = {
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Início', item: `${siteOrigin}/` },
+  ],
+};
+
+const faqPage = faqEntries.length > 0 ? {
+  '@type': 'FAQPage',
+  mainEntity: faqEntries.map((f) => ({
+    '@type': 'Question',
+    name: f.pergunta,
+    acceptedAnswer: { '@type': 'Answer', text: f.resposta },
+  })),
+} : null;
+
+const services = categoriasOrdenadas.map((cat) => ({
+  '@type': 'Service',
+  name: `${cat.data.nome} para chillers e refrigeração industrial`,
+  description: cat.data.descricao,
+  serviceType: cat.data.nome,
+  provider: { '@id': ORG_ID },
+  areaServed: { '@type': 'Country', name: 'Brasil' },
+  ...(cat.data.imagem ? { image: `${siteOrigin}${cat.data.imagem}` } : {}),
+}));
+
+const jsonLdGraph = {
+  '@context': 'https://schema.org',
+  '@graph': [organization, localBusiness, website, breadcrumb, ...services, ...(faqPage ? [faqPage] : [])],
+};
+---
+<!doctype html>
+<html lang="pt-BR" data-variant={variant}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="generator" content={Astro.generator} />
+
+    <!-- Consent Mode v2 (LGPD + Google Ads Limited Ads) — deve vir ANTES do GTM/GA4 -->
+    <!-- Defaults TODOS denied: campanha continua medindo via Limited Ads (gclid via URL) -->
+    <!-- Banner de consent (ConsentBanner.astro) faz o gtag('consent', 'update', ...) ao usuário decidir -->
+    <script is:inline>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){ dataLayer.push(arguments); }
+      gtag('consent', 'default', {
+        ad_storage: 'denied',
+        ad_user_data: 'denied',
+        ad_personalization: 'denied',
+        analytics_storage: 'denied',
+        functionality_storage: 'granted',
+        security_storage: 'granted',
+        wait_for_update: 500,
+      });
+      gtag('set', 'ads_data_redaction', true);
+      gtag('set', 'url_passthrough', true);
+    </script>
+
+    <!-- Verification tags (injetam só se houver token no config) -->
+    <SearchConsole token={gscToken} />
+    <BingWebmaster token={bingToken} />
+
+    <!-- GTM head snippet (só renderiza se gtmId estiver preenchido) -->
+    <GTM id={gtmId} />
+
+    <!-- GA4 via gtag direto (fallback / debug; recomendado usar via GTM) -->
+    <GA4 measurementId={ga4Id} />
+
+    <!-- Preconnects para recursos externos críticos -->
+    <link rel="preconnect" href="https://webhook.hablla.com" crossorigin />
+    <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin />
+    <link rel="preconnect" href="https://www.google-analytics.com" crossorigin />
+
+    <!-- Favicons (gerado via realfavicongenerator.net) -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png" />
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-title" content="Chiller Peças" />
+    <link rel="manifest" href="/site.webmanifest" />
+
+    <link rel="canonical" href={canonicalURL} />
+    <title>{pageTitle}</title>
+    <meta name="description" content={pageDescription} />
+
+    <!-- SEO core (robots condicional por variant: error/legal/default) -->
+    <meta name="robots" content={robotsContent} />
+    <meta name="author" content={s.empresa.nome} />
+    <meta name="publisher" content={s.empresa.nome} />
+    <meta name="geo.region" content="BR-SP" />
+    <meta name="geo.placename" content={s.endereco.cidade} />
+    <meta name="geo.position" content="-23.5414;-46.5703" />
+    <meta name="ICBM" content="-23.5414, -46.5703" />
+    <meta name="theme-color" content="#085ba7" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={s.empresa.nome} />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={pageDescription} />
+    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:image" content={ogImageURL} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={`${s.empresa.nome} — ${s.empresa.tagline}`} />
+    <meta property="og:locale" content="pt_BR" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={pageTitle} />
+    <meta name="twitter:description" content={pageDescription} />
+    <meta name="twitter:image" content={ogImageURL} />
+    <meta name="twitter:image:alt" content={`${s.empresa.nome} — ${s.empresa.tagline}`} />
+
+    <!-- JSON-LD @graph multi-entidade -->
+    <script type="application/ld+json" is:inline set:html={JSON.stringify(jsonLdGraph)} />
+
+    <!-- Captura de atribuição (UTM + click IDs + first/last touch + session) -->
+    <script is:inline>
+      (function () {
+        var UTM = ['utm_source','utm_medium','utm_campaign','utm_term','utm_content','utm_id'];
+        var CLK = ['gclid','gbraid','wbraid','fbclid','msclkid','ttclid'];
+        try {
+          var url = new URL(location.href);
+          var params = {};
+          url.searchParams.forEach(function (v, k) { params[k] = v; });
+          var utm = {}; UTM.forEach(function (k) { utm[k] = params[k] || ''; });
+          var click = {}; CLK.forEach(function (k) { click[k] = params[k] || ''; });
+          var hasAttr = Object.values(utm).concat(Object.values(click)).some(Boolean);
+          var now = new Date().toISOString();
+          var touch = Object.assign({}, utm, click, {
+            timestamp: now,
+            landing_url: url.href,
+            referrer: document.referrer || '',
+          });
+          if (hasAttr && !localStorage.getItem('cp_first_touch')) {
+            localStorage.setItem('cp_first_touch', JSON.stringify(touch));
+          }
+          if (hasAttr) {
+            localStorage.setItem('cp_last_touch', JSON.stringify(touch));
+          }
+          if (!sessionStorage.getItem('cp_session')) {
+            var uuid = (crypto && crypto.randomUUID)
+              ? crypto.randomUUID()
+              : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+                  var r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+                  return v.toString(16);
+                });
+            sessionStorage.setItem('cp_session', uuid);
+          }
+          window.dataLayer = window.dataLayer || [];
+          window.dataLayer.push({
+            event: 'lp_page_view',
+            timestamp: now,
+            page_path: url.pathname,
+            page_location: url.href,
+            attribution_utm_source: utm.utm_source,
+            attribution_utm_medium: utm.utm_medium,
+            attribution_utm_campaign: utm.utm_campaign,
+            attribution_utm_term: utm.utm_term,
+            attribution_utm_content: utm.utm_content,
+            attribution_gclid: click.gclid,
+            attribution_fbclid: click.fbclid,
+            attribution_session_id: sessionStorage.getItem('cp_session'),
+          });
+        } catch (e) { /* silent */ }
+      })();
+    </script>
+  </head>
+  <body>
+    <GTMNoscript id={gtmId} />
+    <slot />
+    <ConsentBanner />
+  </body>
+</html>

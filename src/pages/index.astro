@@ -1,0 +1,864 @@
+---
+import { getEntry, getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import WhatsAppModal from '../components/WhatsAppModal.astro';
+
+const site = (await getEntry('site', 'config'))!.data;
+const categorias = (await getCollection('categorias')).sort((a, b) => a.data.ordem - b.data.ordem);
+const marcas = await getCollection('marcas');
+const depoimentos = await getCollection('depoimentos');
+
+// FAQ (carregado do content collection)
+let faqEntries: Array<{ id: string; pergunta: string; resposta: string }> = [];
+try {
+  const faqAll = await getCollection('faq');
+  faqEntries = faqAll
+    .sort((a, b) => a.data.ordem - b.data.ordem)
+    .map((e) => ({ id: e.data.id, pergunta: e.data.pergunta, resposta: e.data.resposta }));
+} catch {
+  faqEntries = [];
+}
+
+// Webhook vem do config (fallback pro valor conhecido caso campo ausente)
+const webhookUrl = site.webhookLead ?? 'https://webhook.hablla.com/v1/69eb660b9a7223d20a094b05';
+
+// Marcas mantidas no <ul class="sr-only"> da seção de marquee — lista textual pra leitores de tela.
+// O marquee visível agora exibe a frase "Trabalhamos com as melhores marcas..." em loop.
+
+// Badges rotativos para categorias (todas com PRONTA ENTREGA por enquanto)
+const categoryBadges: Record<string, string> = {
+  compressores: 'PRONTA ENTREGA',
+  valvulas: 'PRONTA ENTREGA',
+  'oleos-sinteticos': 'PRONTA ENTREGA',
+  filtros: 'PRONTA ENTREGA',
+  'motores-ventiladores': 'PRONTA ENTREGA',
+  'placas-modulos': 'PRONTA ENTREGA',
+};
+
+// Iniciais para avatar placeholder
+const getInitials = (nome: string) =>
+  nome
+    .split(' ')
+    .map((n) => n[0])
+    .slice(0, 2)
+    .join('')
+    .toUpperCase();
+---
+
+<BaseLayout variant="v4" title="Chiller Peças — Peças originais para chillers e refrigeração industrial">
+  <!-- ============================================================
+       HEADER — sticky, com logo + mini CTA que abre modal
+       ============================================================ -->
+  <header class="sticky top-0 z-40 bg-white border-b-2 border-brand-light" role="banner">
+    <div class="max-w-7xl mx-auto px-4 md:px-8 h-16 flex items-center justify-between">
+      <a
+        href="#top"
+        class="nav-brand flex items-center gap-2"
+        data-gtm-event="cta_click"
+        data-gtm-location="header"
+        data-gtm-label="logo_home"
+        data-gtm-category="navegacao"
+        aria-label="Chiller Peças — voltar ao topo"
+      >
+        <img
+          src="/logo.png"
+          alt="Chiller Peças"
+          width="180"
+          height="40"
+          class="h-9 md:h-10 w-auto"
+          fetchpriority="high"
+        />
+      </a>
+      <nav class="nav hidden md:flex items-center gap-7 font-sans text-sm font-semibold text-brand-900" aria-label="Principal">
+        <a href="#categorias" class="nav-link hover:text-brand-500 transition-colors">Categorias</a>
+        <a href="#marcas" class="nav-link hover:text-brand-500 transition-colors">Marcas</a>
+        <a href="#depoimentos" class="nav-link hover:text-brand-500 transition-colors">Clientes</a>
+        <a href="#sobre" class="nav-link hover:text-brand-500 transition-colors">Sobre</a>
+        <a href="#faq" class="nav-link hover:text-brand-500 transition-colors">FAQ</a>
+      </nav>
+      <button
+        type="button"
+        class="cta modal-trigger group inline-flex items-center gap-2 bg-brand-accent text-white font-sans font-bold text-sm px-4 py-2.5 rounded-full shadow-[0_6px_0_0_#c46400] hover:shadow-[0_2px_0_0_#c46400] hover:translate-y-[4px] transition-all"
+        data-open-whatsapp-modal
+        data-gtm-event="cta_click"
+        data-gtm-location="header"
+        data-gtm-label="cotar_agora"
+        data-gtm-category="whatsapp"
+      >
+        <svg viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4" aria-hidden="true">
+          <path d="M17.6 6.3A7.8 7.8 0 0 0 12 4a7.9 7.9 0 0 0-6.8 11.9L4 20l4.2-1.1a7.9 7.9 0 0 0 3.8 1h0a7.9 7.9 0 0 0 5.6-13.6zM12 19.4a6.5 6.5 0 0 1-3.3-.9l-.2-.1-2.5.6.7-2.4-.2-.3a6.6 6.6 0 1 1 12.2-3.5 6.6 6.6 0 0 1-6.7 6.6zm3.7-4.9c-.2-.1-1.2-.6-1.4-.7s-.3-.1-.5.1-.5.7-.6.8-.2.2-.4.1a5.4 5.4 0 0 1-2.6-2.3c-.2-.3.2-.3.5-1s.2-.3.1-.5-.5-1.2-.7-1.6-.3-.4-.4-.4h-.4a.8.8 0 0 0-.5.2 2.3 2.3 0 0 0-.7 1.7 4 4 0 0 0 .8 2.1 9 9 0 0 0 3.4 3c.5.2.9.3 1.2.4a2.8 2.8 0 0 0 1.3.1 2.1 2.1 0 0 0 1.4-1 1.7 1.7 0 0 0 .1-1c0-.1-.2-.2-.4-.3z" />
+        </svg>
+        <span>Cotar agora</span>
+      </button>
+    </div>
+  </header>
+
+  <main id="top">
+    <!-- ============================================================
+         HERO
+         ============================================================ -->
+    <section class="relative overflow-hidden bg-white" aria-labelledby="hero-title">
+      <!-- Foto da fachada à direita (Opção B: lado direito assumido) -->
+      <div class="absolute inset-y-0 right-0 w-full md:w-3/4 lg:w-3/5 pointer-events-none" aria-hidden="true">
+        <picture>
+          <source srcset="/images/loja-hero.webp" type="image/webp" />
+          <img
+            src="/images/loja-hero.jpg"
+            alt=""
+            class="absolute inset-0 w-full h-full object-cover object-center"
+            loading="eager"
+            decoding="async"
+            fetchpriority="high"
+          />
+        </picture>
+        <!-- Fade branco: cobre o lado esquerdo (onde fica o texto) -->
+        <div class="absolute inset-0 bg-gradient-to-r from-white from-0% via-white/85 via-25% to-transparent to-65% md:to-55%"></div>
+        <!-- Mobile: véu branco extra pra texto sobreviver -->
+        <div class="absolute inset-0 bg-white/55 md:hidden"></div>
+        <!-- Tint azul sutil pra integrar com a paleta -->
+        <div class="absolute inset-0 bg-gradient-to-l from-brand-900/10 to-transparent"></div>
+      </div>
+      <!-- Luz ambiente azul (mantida) — fica por cima da foto adicionando ar -->
+      <div class="absolute -right-20 top-0 w-[520px] h-[520px] bg-brand-500 rounded-full blur-3xl opacity-15 pointer-events-none" aria-hidden="true"></div>
+
+      <div class="relative max-w-7xl mx-auto px-4 md:px-8 pt-10 pb-16 md:pt-20 md:pb-28">
+        <div class="grid lg:grid-cols-12 gap-8 items-center">
+          <div class="lg:col-span-7 relative">
+            <!-- Badge urgência -->
+            <div class="inline-flex items-center gap-2 bg-brand-accent/15 border border-brand-accent text-brand-accent font-sans font-bold text-xs tracking-wider uppercase px-3 py-1.5 rounded-full mb-6">
+              <span class="relative flex h-2 w-2">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-accent opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-2 w-2 bg-brand-accent"></span>
+              </span>
+              Pronta entrega · Despacho em 24h em SP capital
+            </div>
+
+            <h1 id="hero-title" class="font-display tracking-tight text-brand-900 leading-[1.2] text-5xl sm:text-6xl md:text-7xl lg:text-8xl">
+              CHILLER PAROU?<br />
+              <span class="text-brand-500">TEMOS A PEÇA</span><br />
+              <span class="relative inline-block">
+                À PRONTA ENTREGA.
+                <svg class="absolute left-0 -bottom-2 w-full h-3" viewBox="0 0 300 12" preserveAspectRatio="none" aria-hidden="true">
+                  <path d="M2 8 Q 75 0 150 6 T 298 4" stroke="#ff901c" stroke-width="5" fill="none" stroke-linecap="round" />
+                </svg>
+              </span>
+            </h1>
+
+            <p class="mt-8 text-lg md:text-xl text-brand-900/80 font-sans max-w-xl leading-relaxed">
+              +30 mil peças para chillers em estoque: <strong class="text-brand-900">compressores, gás refrigerante, placas eletrônicas, óleos lubrificantes, sensores, válvulas de expansão, tubos de cobre, filtros, motores, hélices e turbinas</strong>. <strong class="text-brand-900">Cotação pelo WhatsApp.</strong>
+            </p>
+
+            <!-- CTAs duplos -->
+            <div class="mt-10 flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
+              <button
+                type="button"
+                class="cta cta--primary modal-trigger group relative inline-flex items-center justify-center gap-3 bg-brand-accent text-white font-sans font-extrabold text-lg md:text-xl py-5 px-8 md:px-10 rounded-full shadow-[0_8px_0_0_#c46400] hover:shadow-[0_3px_0_0_#c46400] hover:translate-y-[5px] transition-all"
+                data-open-whatsapp-modal
+                data-gtm-event="cta_click"
+                data-gtm-location="hero_primary"
+                data-gtm-label="pedir_cotacao_whatsapp"
+                data-gtm-category="whatsapp"
+              >
+                <svg viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6" aria-hidden="true">
+                  <path d="M17.6 6.3A7.8 7.8 0 0 0 12 4a7.9 7.9 0 0 0-6.8 11.9L4 20l4.2-1.1a7.9 7.9 0 0 0 3.8 1h0a7.9 7.9 0 0 0 5.6-13.6zM12 19.4a6.5 6.5 0 0 1-3.3-.9l-.2-.1-2.5.6.7-2.4-.2-.3a6.6 6.6 0 1 1 12.2-3.5 6.6 6.6 0 0 1-6.7 6.6zm3.7-4.9c-.2-.1-1.2-.6-1.4-.7s-.3-.1-.5.1-.5.7-.6.8-.2.2-.4.1a5.4 5.4 0 0 1-2.6-2.3c-.2-.3.2-.3.5-1s.2-.3.1-.5-.5-1.2-.7-1.6-.3-.4-.4-.4h-.4a.8.8 0 0 0-.5.2 2.3 2.3 0 0 0-.7 1.7 4 4 0 0 0 .8 2.1 9 9 0 0 0 3.4 3c.5.2.9.3 1.2.4a2.8 2.8 0 0 0 1.3.1 2.1 2.1 0 0 0 1.4-1 1.7 1.7 0 0 0 .1-1c0-.1-.2-.2-.4-.3z" />
+                </svg>
+                PEDIR COTAÇÃO NO WHATSAPP
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" class="w-5 h-5 group-hover:translate-x-1 transition-transform" aria-hidden="true">
+                  <path d="M5 12h14M13 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+              </button>
+              <a
+                href="#categorias"
+                class="inline-flex items-center justify-center gap-2 bg-white border-2 border-brand-900 text-brand-900 font-sans font-bold text-base md:text-lg py-[18px] px-8 rounded-full hover:bg-brand-900 hover:text-white transition-colors"
+                data-gtm-event="nav_click"
+                data-gtm-location="hero_secondary"
+                data-gtm-label="ver_categorias"
+                data-gtm-category="navegacao"
+              >
+                Ver categorias
+              </a>
+            </div>
+
+            <!-- Microcopy -->
+            <p class="mt-5 text-sm text-brand-900/60 font-sans flex items-center gap-2">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="w-4 h-4 text-brand-accent" aria-hidden="true">
+                <path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+              Sem burocracia · Sem cadastro · Atendimento imediato
+            </p>
+          </div>
+
+          <!-- Coluna visual: selo + card de stats -->
+          <div class="lg:col-span-5 relative min-h-[380px] lg:min-h-[520px]">
+
+            <!-- Card stats -->
+            <div class="absolute bottom-0 left-0 right-0 lg:right-12 bg-brand-900 text-white rounded-3xl p-6 md:p-8 shadow-2xl">
+              <div class="text-xs font-sans font-bold uppercase tracking-[0.2em] text-brand-accent mb-4">Comprovado na prática</div>
+              <div class="grid grid-cols-2 gap-4">
+                {site.estatisticas.map((e) => (
+                  <div>
+                    <div class="font-display text-4xl md:text-5xl leading-none text-white">{e.numero}</div>
+                    <div class="mt-2 font-sans text-xs md:text-sm text-white/70 uppercase tracking-wider">{e.rotulo}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         FAIXA BENEFÍCIOS
+         ============================================================ -->
+    <section class="bg-brand-light py-8" aria-label="Benefícios">
+      <div class="max-w-7xl mx-auto px-4 md:px-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {[
+            { label: 'Pronta entrega', sub: 'Despacho em até 24h' },
+            { label: 'Atendimento técnico', sub: 'Equipe especialista em Refrigeração' },
+          ].map((item) => (
+            <div class="flex items-center gap-4 bg-white rounded-2xl p-5 shadow-sm">
+              <div class="flex-shrink-0 w-11 h-11 rounded-full bg-brand-accent grid place-items-center" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5" class="w-6 h-6">
+                  <path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+              </div>
+              <div>
+                <div class="font-display text-xl text-brand-900 tracking-wide uppercase leading-none">{item.label}</div>
+                <div class="font-sans text-sm text-brand-900/60 mt-1">{item.sub}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         CATEGORIAS
+         ============================================================ -->
+    <section id="categorias" class="bg-white py-16 md:py-24" aria-labelledby="categorias-title">
+      <div class="max-w-7xl mx-auto px-4 md:px-8">
+        <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-10">
+          <div>
+            <div class="font-sans text-sm uppercase tracking-[0.25em] text-brand-500 font-bold mb-3">
+              O que temos em estoque
+            </div>
+            <h2 id="categorias-title" class="font-display text-4xl md:text-6xl text-brand-900 leading-[1.2] tracking-tight">
+              ESCOLHA SUA CATEGORIA.<br />
+              <span class="text-brand-500">PEÇA NO WHATSAPP.</span>
+            </h2>
+          </div>
+          <button
+            type="button"
+            class="modal-trigger self-start md:self-auto inline-flex items-center gap-2 font-sans font-bold text-brand-accent hover:text-brand-900 transition-colors bg-transparent border-0 cursor-pointer p-0"
+            data-open-whatsapp-modal
+            data-gtm-event="cta_click"
+            data-gtm-location="categorias_header"
+            data-gtm-label="nao_achou"
+            data-gtm-category="whatsapp"
+          >
+            Não achou? Pergunte no WhatsApp
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" class="w-5 h-5" aria-hidden="true">
+              <path d="M5 12h14M13 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          {categorias.map((cat, idx) => {
+            const badge = categoryBadges[cat.id] ?? 'PRONTA ENTREGA';
+            return (
+              <article class={`category-card ${cat.data.destaque ? 'category-card--featured' : ''} group relative rounded-2xl overflow-hidden border-2 border-brand-light bg-white transition-all duration-200 hover:-translate-y-1 hover:border-brand-accent hover:shadow-[8px_8px_0_0_rgba(255,144,28,0.18)] focus-within:border-brand-accent focus-within:shadow-[8px_8px_0_0_rgba(255,144,28,0.18)]`}>
+                {cat.data.imagem && (
+                  <div class="aspect-[16/10] w-full overflow-hidden bg-brand-light">
+                    <picture>
+                      <source srcset={cat.data.imagem.replace(/\.jpg$/, '.webp')} type="image/webp" />
+                      <img
+                        src={cat.data.imagem}
+                        alt={`${cat.data.nome} para chillers e refrigeração industrial`}
+                        width="1000"
+                        height="625"
+                        loading="lazy"
+                        decoding="async"
+                        class="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500"
+                      />
+                    </picture>
+                  </div>
+                )}
+                <div class="p-6 md:p-7 relative">
+                  {badge && (
+                    <span class="absolute -top-3 left-5 bg-brand-accent text-white font-display text-xs tracking-wider px-3 py-1.5 rounded-full shadow-md">
+                      ★ {badge}
+                    </span>
+                  )}
+                  <div class="flex items-baseline gap-3 mb-3">
+                    <span class="font-display text-6xl md:text-7xl leading-none text-brand-accent/90 group-hover:text-brand-accent transition-colors" aria-hidden="true">
+                      0{idx + 1}
+                    </span>
+                    <span class="font-sans text-[10px] uppercase tracking-[0.25em] text-brand-900/40 font-bold" aria-hidden="true">
+                      Categoria
+                    </span>
+                  </div>
+                  <h3 class="font-display text-2xl md:text-3xl text-brand-900 uppercase tracking-wide leading-tight mb-2">{cat.data.nome}</h3>
+                  <p class="font-sans text-sm text-brand-900/70 mb-5 leading-relaxed">{cat.data.descricao}</p>
+                  <button
+                    type="button"
+                    class={`modal-trigger inline-flex items-center gap-2 font-sans font-bold text-sm ${cat.data.destaque ? 'text-brand-accent' : 'text-brand-500'} hover:gap-3 transition-all bg-transparent border-0 cursor-pointer p-0`}
+                    data-open-whatsapp-modal
+                    data-gtm-event="cta_click"
+                    data-gtm-location={`categoria_card_${cat.id}`}
+                    data-gtm-label={`cotar_${cat.id}`}
+                    data-gtm-category="whatsapp"
+                  >
+                    Cotar agora
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" class="w-4 h-4" aria-hidden="true">
+                      <path d="M5 12h14M13 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                  </button>
+                </div>
+              </article>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         FAIXA MARCAS — marquee auto-scroll
+         ============================================================ -->
+    <section id="marcas" class="bg-brand-500 py-12 md:py-16 overflow-hidden" aria-labelledby="marcas-title">
+      <h2 id="marcas-title" class="sr-only">Trabalhamos com as melhores marcas do mercado de refrigeração</h2>
+      <div class="marquee-wrapper" aria-hidden="true">
+        <div class="marquee-track items-center">
+          {Array.from({ length: 8 }).map(() => (
+            <span class="font-display text-2xl md:text-4xl lg:text-5xl text-white uppercase tracking-wide leading-[1.3] whitespace-nowrap inline-flex items-center gap-7 md:gap-10 px-5 md:px-8">
+              Trabalhamos com as melhores marcas do mercado de refrigeração
+              <span class="text-brand-accent text-3xl md:text-5xl">★</span>
+            </span>
+          ))}
+        </div>
+      </div>
+      <!-- Lista textual acessível com as marcas reais que a empresa atende -->
+      <ul class="sr-only">
+        {marcas.map((m) => <li>{m.data.nome}</li>)}
+      </ul>
+    </section>
+
+    <!-- ============================================================
+         PROVA SOCIAL — números gigantes + CTA imenso
+         ============================================================ -->
+    <section class="bg-white py-20 md:py-28 relative overflow-hidden" aria-labelledby="prova-social-title">
+      <div class="absolute inset-0 pointer-events-none opacity-[0.04]" aria-hidden="true">
+        <div class="font-display text-[20rem] leading-none text-brand-500 whitespace-nowrap -rotate-6 -mt-10">
+          ORIGINAL · ORIGINAL
+        </div>
+      </div>
+      <div class="relative max-w-7xl mx-auto px-4 md:px-8">
+        <div class="text-center mb-14">
+          <div class="font-sans text-sm uppercase tracking-[0.25em] text-brand-500 font-bold mb-4">
+            Números que falam por si
+          </div>
+          <h2 id="prova-social-title" class="font-display text-5xl md:text-7xl text-brand-900 leading-[1.2] tracking-tight">
+            MAIS DE <span class="text-brand-accent">5 ANOS</span><br />
+            MANTENDO CHILLERS LIGADOS.
+          </h2>
+        </div>
+
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-10 mb-16">
+          {site.estatisticas.map((e) => (
+            <div class="text-center">
+              <div class="font-display text-6xl md:text-8xl text-brand-500 leading-none">{e.numero}</div>
+              <div class="mt-3 font-sans text-xs md:text-sm uppercase tracking-wider text-brand-900/70 font-bold">{e.rotulo}</div>
+            </div>
+          ))}
+        </div>
+
+        <!-- CTA imenso central -->
+        <div class="relative max-w-3xl mx-auto">
+          <!-- Seta decorativa: só aparece em lg+ onde há espaço livre à esquerda -->
+          <svg viewBox="0 0 120 80" class="hidden lg:block absolute -left-36 xl:-left-44 top-1/2 -translate-y-1/2 w-28 xl:w-32 text-brand-accent rotate-12 pointer-events-none" aria-hidden="true">
+            <path d="M5 40 Q 40 10 95 40" stroke="currentColor" stroke-width="4" fill="none" stroke-linecap="round" />
+            <path d="M85 28 L 100 40 L 85 52" stroke="currentColor" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+          <button
+            type="button"
+            class="cta cta--primary modal-trigger group flex flex-col w-full bg-brand-accent text-white rounded-3xl p-6 sm:p-8 md:p-10 text-center shadow-[0_12px_0_0_#c46400] hover:shadow-[0_4px_0_0_#c46400] hover:translate-y-2 transition-all border-0"
+            data-open-whatsapp-modal
+            data-gtm-event="cta_click"
+            data-gtm-location="cta_central"
+            data-gtm-label="falar_com_especialista"
+            data-gtm-category="whatsapp"
+          >
+            <div class="font-sans text-[10px] sm:text-xs md:text-sm uppercase tracking-[0.25em] text-white/80 mb-3">
+              1 clique = 1 cotação
+            </div>
+            <div class="font-sans font-black uppercase text-2xl sm:text-3xl md:text-4xl lg:text-5xl leading-[1.2] tracking-tight">
+              Falar com especialista agora
+            </div>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         DEPOIMENTOS
+         ============================================================ -->
+    <section id="depoimentos" class="bg-brand-light py-16 md:py-24" aria-labelledby="depoimentos-title">
+      <div class="max-w-7xl mx-auto px-4 md:px-8">
+        <div class="mb-12 text-center">
+          <div class="font-sans text-sm uppercase tracking-[0.25em] text-brand-500 font-bold mb-3">
+            Clientes reais · Resultados reais
+          </div>
+          <h2 id="depoimentos-title" class="font-display text-4xl md:text-6xl text-brand-900 leading-[1.2] tracking-tight mb-6">
+            +17 MIL EMPRESAS <span class="text-brand-accent">CONFIAM</span><br /> NA CHILLER PEÇAS
+          </h2>
+          <!-- Selo Google: prova social verificável (clicável → abre Google Reviews) -->
+          {site.googleReviewsUrl ? (
+            <a
+              href={site.googleReviewsUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="group inline-flex items-center gap-3 bg-white px-5 py-3 rounded-full shadow-md border border-brand-light hover:shadow-xl hover:border-brand-accent transition-all"
+              aria-label="Ver as 480 avaliações da Chiller Peças no Google (5 estrelas) — abre em nova aba"
+              data-gtm-event="cta_click"
+              data-gtm-location="depoimentos_google_badge"
+              data-gtm-label="ver_avaliacoes_google"
+              data-gtm-category="social_proof"
+            >
+              <span class="font-display text-2xl text-brand-900 leading-none">5,0</span>
+              <span class="flex gap-0.5" aria-hidden="true">
+                {[0,1,2,3,4].map(() => (
+                  <svg viewBox="0 0 24 24" fill="#fbbc04" class="w-4 h-4">
+                    <path d="M12 2l2.95 6.7 7.05.65-5.35 4.95L18.18 22 12 18.27 5.82 22l1.53-7.7L2 9.35l7.05-.65L12 2z"/>
+                  </svg>
+                ))}
+              </span>
+              <span class="font-sans text-sm text-brand-900/70 group-hover:text-brand-900 transition-colors">
+                <strong class="text-brand-900">480 avaliações</strong> no Google
+              </span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="w-4 h-4 text-brand-500 group-hover:text-brand-accent group-hover:translate-x-0.5 transition-all" aria-hidden="true">
+                <path d="M7 17L17 7M17 7H8M17 7v9" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </a>
+          ) : (
+            <div class="inline-flex items-center gap-3 bg-white px-5 py-3 rounded-full shadow-md border border-brand-light">
+              <span class="font-display text-2xl text-brand-900 leading-none">5,0</span>
+              <span class="flex gap-0.5" aria-label="5 de 5 estrelas">
+                {[0,1,2,3,4].map(() => (
+                  <svg viewBox="0 0 24 24" fill="#fbbc04" class="w-4 h-4" aria-hidden="true">
+                    <path d="M12 2l2.95 6.7 7.05.65-5.35 4.95L18.18 22 12 18.27 5.82 22l1.53-7.7L2 9.35l7.05-.65L12 2z"/>
+                  </svg>
+                ))}
+              </span>
+              <span class="font-sans text-sm text-brand-900/70">
+                <strong class="text-brand-900">480 avaliações</strong> no Google
+              </span>
+            </div>
+          )}
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {depoimentos.map((d) => (
+            <article class="testimonial-card bg-white rounded-2xl p-7 shadow-lg border-t-4 border-brand-500 flex flex-col">
+              <div class="flex gap-1 mb-5" aria-label="5 estrelas">
+                {[0, 1, 2, 3, 4].map(() => (
+                  <svg viewBox="0 0 24 24" fill="#ff901c" class="w-5 h-5" aria-hidden="true">
+                    <path d="M12 2l3.1 6.3 7 1-5 4.9 1.2 6.8L12 17.8 5.7 21l1.2-6.8-5-4.9 7-1z" />
+                  </svg>
+                ))}
+              </div>
+              <p class="font-sans text-brand-900/85 leading-relaxed mb-6 flex-1">
+                <span class="font-accent text-3xl text-brand-accent leading-none align-top mr-1" aria-hidden="true">&ldquo;</span>
+                {d.data.texto}
+              </p>
+              <div class="flex items-center gap-4 pt-5 border-t border-brand-light">
+                <div class="w-12 h-12 rounded-full bg-brand-500 text-white font-display text-lg grid place-items-center" aria-hidden="true">
+                  {getInitials(d.data.nome)}
+                </div>
+                <div>
+                  <div class="font-display text-lg text-brand-900 leading-tight uppercase tracking-wide">{d.data.nome}</div>
+                  <div class="font-sans text-xs text-brand-900/60">
+                    {d.data.cargo ? `${d.data.cargo} · ` : ''}{d.data.empresa}
+                  </div>
+                </div>
+              </div>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         SOBRE — grid 2 colunas (texto + fotos prédio/equipe)
+         ============================================================ -->
+    <section id="sobre" class="bg-white py-16 md:py-24" aria-labelledby="sobre-title">
+      <div class="max-w-7xl mx-auto px-4 md:px-8">
+        <div class="grid lg:grid-cols-12 gap-10 lg:gap-14 items-center">
+          <div class="lg:col-span-6">
+            <div class="font-sans text-sm uppercase tracking-[0.25em] text-brand-500 font-bold mb-4">
+              Quem somos
+            </div>
+            <h2 id="sobre-title" class="font-display text-4xl md:text-6xl text-brand-900 leading-[1.2] tracking-tight mb-6">
+              ESPECIALISTAS EM <span class="text-brand-500">REFRIGERAÇÃO INDUSTRIAL</span>.
+            </h2>
+            <p class="font-sans text-lg md:text-xl text-brand-900/75 leading-relaxed mb-6">
+              {site.empresa.descricao}
+            </p>
+            <ul class="font-sans text-base text-brand-900/80 mb-8 space-y-2">
+              <li class="flex items-start gap-3">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#ff901c" stroke-width="3" class="w-5 h-5 mt-0.5 flex-shrink-0" aria-hidden="true"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <span>Equipe técnica especializada em chillers e HVAC</span>
+              </li>
+              <li class="flex items-start gap-3">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#ff901c" stroke-width="3" class="w-5 h-5 mt-0.5 flex-shrink-0" aria-hidden="true"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <span>Peças originais das melhores marcas do mercado de refrigeração</span>
+              </li>
+              <li class="flex items-start gap-3">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#ff901c" stroke-width="3" class="w-5 h-5 mt-0.5 flex-shrink-0" aria-hidden="true"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <span>Logística própria com despacho em até 24h em São Paulo Capital</span>
+              </li>
+            </ul>
+            <button
+              type="button"
+              class="cta modal-trigger inline-flex items-center gap-3 bg-brand-500 text-white font-sans font-bold text-lg py-4 px-8 rounded-full hover:bg-brand-900 transition-colors shadow-lg border-0 cursor-pointer"
+              data-open-whatsapp-modal
+              data-gtm-event="cta_click"
+              data-gtm-location="sobre"
+              data-gtm-label="conversar_com_equipe"
+              data-gtm-category="whatsapp"
+            >
+              Conversar com a equipe
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" class="w-5 h-5" aria-hidden="true">
+                <path d="M5 12h14M13 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </button>
+          </div>
+
+          <div class="lg:col-span-6 grid grid-cols-1 gap-4">
+            <figure class="overflow-hidden rounded-2xl shadow-xl border-4 border-white ring-1 ring-brand-light bg-brand-light">
+              <picture>
+                <source srcset="/images/loja.webp" type="image/webp" />
+                <img
+                  src="/images/loja.jpg"
+                  alt="Fachada da Chiller Peças — loja e estoque em São Paulo/SP"
+                  width="1200"
+                  height="800"
+                  loading="lazy"
+                  decoding="async"
+                  class="w-full h-auto object-cover aspect-[3/2]"
+                />
+              </picture>
+            </figure>
+            <figure class="overflow-hidden rounded-2xl shadow-xl border-4 border-white ring-1 ring-brand-light bg-brand-light">
+              <picture>
+                <source srcset="/images/logistica.webp" type="image/webp" />
+                <img
+                  src="/images/logistica.jpg"
+                  alt="Estoque Chiller Peças com mais de 30 mil peças originais para chillers — Copeland, Bitzer, Carrier e outras marcas em pronta entrega"
+                  width="1200"
+                  height="675"
+                  loading="lazy"
+                  decoding="async"
+                  class="w-full h-auto object-cover aspect-[16/9]"
+                />
+              </picture>
+              <figcaption class="sr-only">Estoque Chiller Peças com peças originais em pronta entrega</figcaption>
+            </figure>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         FAQ — crítico para AEO (LLM search)
+         ============================================================ -->
+    {faqEntries.length > 0 && (
+      <section id="faq" class="bg-brand-light py-16 md:py-24" aria-labelledby="faq-title">
+        <div class="max-w-4xl mx-auto px-4 md:px-8">
+          <div class="text-center mb-10">
+            <div class="font-sans text-sm uppercase tracking-[0.25em] text-brand-500 font-bold mb-3">
+              Perguntas frequentes
+            </div>
+            <h2 id="faq-title" class="font-display text-4xl md:text-6xl text-brand-900 leading-[1.2] tracking-tight">
+              DÚVIDAS COMUNS DOS<br /><span class="text-brand-500">NOSSOS CLIENTES</span>
+            </h2>
+          </div>
+
+          <div class="space-y-3">
+            {faqEntries.map((f) => (
+              <details class="faq-item group bg-white rounded-xl border-2 border-brand-light open:border-brand-500 transition-colors">
+                <summary
+                  class="faq-item__question flex items-center justify-between gap-4 cursor-pointer list-none px-5 py-4 md:px-6 md:py-5 font-display text-lg md:text-xl text-brand-900 uppercase tracking-wide"
+                  data-gtm-event="faq_toggle"
+                  data-gtm-location="faq"
+                  data-gtm-label={f.id}
+                  data-gtm-category="engagement"
+                >
+                  <span class="flex-1">{f.pergunta}</span>
+                  <span class="flex-shrink-0 w-8 h-8 rounded-full bg-brand-light text-brand-500 grid place-items-center group-open:bg-brand-accent group-open:text-white transition-colors" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" class="w-4 h-4 group-open:rotate-45 transition-transform">
+                      <path d="M12 5v14M5 12h14" stroke-linecap="round" />
+                    </svg>
+                  </span>
+                </summary>
+                <div class="faq-item__answer px-5 pb-5 md:px-6 md:pb-6 font-sans text-base text-brand-900/80 leading-relaxed">
+                  {f.resposta}
+                </div>
+              </details>
+            ))}
+          </div>
+
+          <div class="mt-10 text-center">
+            <button
+              type="button"
+              class="modal-trigger inline-flex items-center gap-2 font-sans font-bold text-brand-accent hover:text-brand-900 transition-colors bg-transparent border-0 cursor-pointer"
+              data-open-whatsapp-modal
+              data-gtm-event="cta_click"
+              data-gtm-location="faq_footer"
+              data-gtm-label="outras_duvidas"
+              data-gtm-category="whatsapp"
+            >
+              Tem outra dúvida? Pergunte pelo WhatsApp
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" class="w-5 h-5" aria-hidden="true">
+                <path d="M5 12h14M13 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </section>
+    )}
+
+    <!-- ============================================================
+         ÚLTIMA CHANCE — brand-900 full width
+         ============================================================ -->
+    <section class="bg-brand-900 text-white py-20 md:py-28 relative overflow-hidden" aria-labelledby="ultima-title">
+      <div class="absolute top-0 left-0 w-full h-2 bg-brand-accent" aria-hidden="true"></div>
+      <div class="absolute bottom-0 left-0 w-full h-2 bg-brand-accent" aria-hidden="true"></div>
+      <div class="absolute inset-0 opacity-5 pointer-events-none" aria-hidden="true">
+        <div class="font-display text-[18rem] leading-none whitespace-nowrap -rotate-3 text-white -mt-8">
+          AGORA · AGORA · AGORA
+        </div>
+      </div>
+
+      <div class="relative max-w-5xl mx-auto px-4 md:px-8 text-center">
+        <div class="inline-flex items-center gap-2 bg-brand-accent text-white font-sans font-bold text-xs tracking-[0.25em] uppercase px-4 py-2 rounded-full mb-8">
+          <span class="relative flex h-2 w-2" aria-hidden="true">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
+          </span>
+          Última chance
+        </div>
+
+        <h2 id="ultima-title" class="font-display text-5xl sm:text-6xl md:text-8xl leading-[1.2] tracking-tight mb-8">
+          NÃO DEIXE O<br />
+          <span class="text-brand-accent">CHILLER PARADO.</span>
+        </h2>
+        <p class="font-sans text-lg md:text-2xl text-white/80 max-w-2xl mx-auto mb-10 leading-relaxed">
+          Cada hora parado custa caro. Um WhatsApp pra gente resolve.
+          <strong class="text-white">Peça sua cotação agora.</strong>
+        </p>
+
+        <button
+          type="button"
+          class="cta cta--primary modal-trigger group inline-flex items-center justify-center gap-3 bg-brand-accent text-white font-display text-2xl md:text-4xl py-6 md:py-8 px-10 md:px-16 rounded-2xl shadow-[0_12px_0_0_#c46400] hover:shadow-[0_4px_0_0_#c46400] hover:translate-y-2 transition-all tracking-tight border-0 cursor-pointer"
+          data-open-whatsapp-modal
+          data-gtm-event="cta_click"
+          data-gtm-location="ultima_chance"
+          data-gtm-label="falar_no_whatsapp_agora"
+          data-gtm-category="whatsapp"
+        >
+          <svg viewBox="0 0 24 24" fill="currentColor" class="w-8 h-8 md:w-10 md:h-10" aria-hidden="true">
+            <path d="M17.6 6.3A7.8 7.8 0 0 0 12 4a7.9 7.9 0 0 0-6.8 11.9L4 20l4.2-1.1a7.9 7.9 0 0 0 3.8 1h0a7.9 7.9 0 0 0 5.6-13.6zM12 19.4a6.5 6.5 0 0 1-3.3-.9l-.2-.1-2.5.6.7-2.4-.2-.3a6.6 6.6 0 1 1 12.2-3.5 6.6 6.6 0 0 1-6.7 6.6z" />
+          </svg>
+          FALAR NO WHATSAPP AGORA
+        </button>
+
+        <div class="mt-8 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-sm font-sans text-white/70">
+          <span class="inline-flex items-center gap-2">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#ff901c" stroke-width="3" class="w-4 h-4" aria-hidden="true"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Atendimento humano
+          </span>
+          <span class="inline-flex items-center gap-2">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#ff901c" stroke-width="3" class="w-4 h-4" aria-hidden="true"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Sem cadastro
+          </span>
+          <span class="inline-flex items-center gap-2">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#ff901c" stroke-width="3" class="w-4 h-4" aria-hidden="true"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Peças originais
+          </span>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ============================================================
+       FOOTER compacto
+       ============================================================ -->
+  <footer class="bg-brand-900 text-white/70 border-t border-white/10" role="contentinfo">
+    <div class="max-w-7xl mx-auto px-4 md:px-8 py-10 grid grid-cols-1 md:grid-cols-12 gap-8">
+      <div class="md:col-span-3">
+        <img src="/logo-white.png" alt="Chiller Peças" width="180" height="40" class="h-9 w-auto mb-4" loading="lazy" />
+        <p class="font-sans text-sm leading-relaxed">{site.empresa.tagline}</p>
+      </div>
+      <div class="md:col-span-3">
+        <div class="font-display text-sm uppercase tracking-[0.2em] text-brand-accent mb-3">Contato</div>
+        <ul class="space-y-1 font-sans text-sm">
+          <li>Tel · {site.telefone}</li>
+          {site.telefoneWhatsapp && <li>WhatsApp · {site.telefoneWhatsapp}</li>}
+          <li>{site.email}</li>
+          {site.emailSac && <li>{site.emailSac}</li>}
+          <li class="pt-1 text-white/50">{site.horario}</li>
+        </ul>
+      </div>
+      <div class="md:col-span-6">
+        <div class="font-display text-sm uppercase tracking-[0.2em] text-brand-accent mb-3">Endereço · Como chegar</div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5 items-start">
+          <!-- Coluna esquerda: texto do endereço + botão WhatsApp -->
+          <div>
+            <address class="font-sans text-sm not-italic leading-relaxed">
+              {site.endereco.rua}<br />
+              {site.endereco.bairro && <>{site.endereco.bairro}<br /></>}
+              {site.endereco.cidade}/{site.endereco.estado}<br />
+              CEP {site.endereco.cep}
+            </address>
+            <button
+              type="button"
+              class="cta modal-trigger inline-flex items-center gap-2 mt-4 bg-brand-accent text-white font-sans font-bold text-sm px-4 py-2 rounded-full hover:bg-white hover:text-brand-accent transition-colors border-0 cursor-pointer"
+              data-open-whatsapp-modal
+              data-gtm-event="cta_click"
+              data-gtm-location="footer"
+              data-gtm-label="cotar_no_whatsapp"
+              data-gtm-category="whatsapp"
+            >
+              Cotar no WhatsApp
+            </button>
+          </div>
+
+          <!-- Coluna direita: mini-mapa navegável + botão de rota -->
+          <div>
+            <div class="rounded-xl overflow-hidden border border-white/15 shadow-lg bg-white/5">
+              <iframe
+                title="Mini-mapa Chiller Peças — Rua Antônio de Barros, 1093, Tatuapé"
+                src={`https://maps.google.com/maps?q=${encodeURIComponent(`${site.endereco.rua}, ${site.endereco.bairro}, ${site.endereco.cidade} - ${site.endereco.estado}`)}&output=embed&z=16`}
+                class="w-full h-32 sm:h-36 block"
+                loading="lazy"
+                referrerpolicy="no-referrer-when-downgrade"
+                allowfullscreen
+              ></iframe>
+            </div>
+            <a
+              href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(`${site.endereco.rua}, ${site.endereco.bairro}, ${site.endereco.cidade} - ${site.endereco.estado}, ${site.endereco.cep}`)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="inline-flex items-center gap-2 mt-3 bg-white/10 hover:bg-brand-500 text-white font-sans font-bold text-sm px-4 py-2 rounded-full transition-colors border border-white/15"
+              data-gtm-event="cta_click"
+              data-gtm-location="footer_map"
+              data-gtm-label="chegar_chiller_pecas"
+              data-gtm-category="navigation"
+            >
+              <svg viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4 flex-shrink-0" aria-hidden="true">
+                <path d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7zm0 9.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5z"/>
+              </svg>
+              Chegar na Chiller Peças
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Bloco de transparência empresarial (exigido por Google Ads policy) -->
+    <div class="border-t border-white/10">
+      <div class="max-w-7xl mx-auto px-4 md:px-8 py-6">
+        <address class="font-sans text-xs text-white/60 not-italic leading-relaxed">
+          <strong class="text-white/80">{site.empresa.razaoSocial ?? site.empresa.nome}</strong>
+          {site.empresa.cnpj && <> · CNPJ {site.empresa.cnpj}</>}<br />
+          {site.endereco.rua}{site.endereco.bairro && <> · {site.endereco.bairro}</>} · {site.endereco.cidade}/{site.endereco.estado} · CEP {site.endereco.cep}<br />
+          Atendimento: <a href={`tel:${site.telefone.replace(/\D/g, '')}`} class="hover:text-white">{site.telefone}</a>
+          {site.email && <> · <a href={`mailto:${site.email}`} class="hover:text-white">{site.email}</a></>}<br />
+          <span class="text-white/50">{site.horario}</span>
+        </address>
+      </div>
+    </div>
+
+    <!-- Copyright + links legais -->
+    <div class="border-t border-white/10">
+      <div class="max-w-7xl mx-auto px-4 md:px-8 py-5 text-xs font-sans flex flex-col md:flex-row items-center justify-between gap-3">
+        <span class="text-white/60">&copy; {new Date().getFullYear()} {site.empresa.razaoSocial ?? site.empresa.nome} · Desde {site.empresa.desde} mantendo a indústria refrigerada.</span>
+        <nav aria-label="Links legais" class="flex items-center gap-4 text-white/60">
+          <a href="/privacidade" class="hover:text-white transition-colors" data-gtm-event="cta_click" data-gtm-location="footer_legal" data-gtm-label="privacidade">Privacidade</a>
+          <span aria-hidden="true">·</span>
+          <a href="/termos" class="hover:text-white transition-colors" data-gtm-event="cta_click" data-gtm-location="footer_legal" data-gtm-label="termos">Termos de uso</a>
+          <span aria-hidden="true">·</span>
+          <a href="/acessibilidade" class="hover:text-white transition-colors" data-gtm-event="cta_click" data-gtm-location="footer_legal" data-gtm-label="acessibilidade">Acessibilidade</a>
+        </nav>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ============================================================
+       BOTÃO FLUTUANTE WHATSAPP — verde #67c556 com pulse
+       Wrapper fixo; tooltip + botão são irmãos flex (botão NÃO é fixed)
+       ============================================================ -->
+  <div class="fixed bottom-5 right-5 md:bottom-8 md:right-8 z-50 flex items-center gap-3">
+    <!-- Tooltip permanente (desktop) -->
+    <div class="hidden sm:flex items-center gap-2 bg-white rounded-full shadow-xl pl-4 pr-5 py-3 border-2 border-[#67c556]">
+      <svg viewBox="0 0 80 40" class="w-10 h-6 text-[#67c556] flex-shrink-0" aria-hidden="true">
+        <path d="M5 20 L 65 20" stroke="currentColor" stroke-width="4" fill="none" stroke-linecap="round" />
+        <path d="M55 8 L 72 20 L 55 32" stroke="currentColor" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+      <span class="font-sans font-bold text-sm text-brand-900 uppercase tracking-wide leading-none whitespace-nowrap">
+        Fale agora
+      </span>
+    </div>
+
+    <button
+      type="button"
+      class="cta--whatsapp-float modal-trigger"
+      data-open-whatsapp-modal
+      data-gtm-event="cta_click"
+      data-gtm-location="floating"
+      data-gtm-label="abrir_modal_flutuante"
+      data-gtm-category="whatsapp"
+      aria-label="Solicitar cotação no WhatsApp"
+    >
+      <span class="cta--whatsapp-float__pulse" aria-hidden="true"></span>
+      <svg viewBox="0 0 24 24" fill="currentColor" class="relative w-11 h-11 md:w-12 md:h-12" aria-hidden="true">
+        <path d="M17.6 6.3A7.8 7.8 0 0 0 12 4a7.9 7.9 0 0 0-6.8 11.9L4 20l4.2-1.1a7.9 7.9 0 0 0 3.8 1h0a7.9 7.9 0 0 0 5.6-13.6zM12 19.4a6.5 6.5 0 0 1-3.3-.9l-.2-.1-2.5.6.7-2.4-.2-.3a6.6 6.6 0 1 1 12.2-3.5 6.6 6.6 0 0 1-6.7 6.6zm3.7-4.9c-.2-.1-1.2-.6-1.4-.7s-.3-.1-.5.1-.5.7-.6.8-.2.2-.4.1a5.4 5.4 0 0 1-2.6-2.3c-.2-.3.2-.3.5-1s.2-.3.1-.5-.5-1.2-.7-1.6-.3-.4-.4-.4h-.4a.8.8 0 0 0-.5.2 2.3 2.3 0 0 0-.7 1.7 4 4 0 0 0 .8 2.1 9 9 0 0 0 3.4 3c.5.2.9.3 1.2.4a2.8 2.8 0 0 0 1.3.1 2.1 2.1 0 0 0 1.4-1 1.7 1.7 0 0 0 .1-1c0-.1-.2-.2-.4-.3z"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- ============================================================
+       STICKY MOBILE CTA
+       ============================================================ -->
+  <div class="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t-2 border-brand-light px-4 py-3 shadow-[0_-6px_18px_rgba(8,91,167,0.08)]">
+    <button
+      type="button"
+      class="cta cta--primary modal-trigger w-full inline-flex items-center justify-center gap-2 bg-brand-accent text-white font-sans font-extrabold text-base py-4 rounded-full shadow-md border-0 cursor-pointer"
+      data-open-whatsapp-modal
+      data-gtm-event="cta_click"
+      data-gtm-location="sticky_mobile"
+      data-gtm-label="cotar_pelo_whatsapp_agora"
+      data-gtm-category="whatsapp"
+    >
+      <svg viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5" aria-hidden="true">
+        <path d="M17.6 6.3A7.8 7.8 0 0 0 12 4a7.9 7.9 0 0 0-6.8 11.9L4 20l4.2-1.1a7.9 7.9 0 0 0 3.8 1h0a7.9 7.9 0 0 0 5.6-13.6z"/>
+      </svg>
+      Cotar pelo WhatsApp agora
+    </button>
+  </div>
+
+  <!-- ============================================================
+       MODAL WHATSAPP — único, atende todos os triggers
+       ============================================================ -->
+  <WhatsAppModal waNumber={site.whatsapp} webhookUrl={webhookUrl} waMessage={site.mensagemWhatsapp} />
+
+  <style>
+    html { scroll-behavior: smooth; }
+    @media (max-width: 640px) {
+      footer { padding-bottom: 80px; }
+    }
+    /* Remove default marker do <summary> no Safari */
+    .faq-item summary::-webkit-details-marker { display: none; }
+  </style>
+</BaseLayout>

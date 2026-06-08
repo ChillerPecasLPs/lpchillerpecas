@@ -1,0 +1,45 @@
+# Chiller Peças — robots.txt
+# Documentação da empresa: https://chillerpecas.vercel.app/llms.txt
+
+# ---- Crawlers padrão (Google, Bing, etc.) ----
+User-agent: *
+Allow: /
+Disallow: /api/
+
+# ---- Crawlers de busca tradicional ----
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+# ---- Crawlers de LLMs / AI search — explicitamente PERMITIDOS ----
+# Queremos aparecer nas respostas do ChatGPT, Claude, Perplexity e SGE
+User-agent: GPTBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+Sitemap: https://chiller-pecas.vercel.app/sitemap-index.xml

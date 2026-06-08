@@ -1,0 +1,46 @@
+{
+  "config": {
+    "whatsapp": "5511940518767",
+    "mensagemWhatsapp": "Olá! Gostaria de solicitar uma cotação de peças para chiller.",
+    "email": "vendas@chillerpecas.com",
+    "emailSac": "sac@chillerpecas.com",
+    "telefone": "(11) 2918-8119",
+    "telefoneWhatsapp": "(11) 94051-8767",
+    "endereco": {
+      "rua": "Rua Antônio de Barros, 1093",
+      "bairro": "Tatuapé",
+      "cidade": "São Paulo",
+      "estado": "SP",
+      "cep": "03401-000"
+    },
+    "horario": "Seg a Qui 7h-18h · Sex 7h-17h · Sáb 8h-13h",
+    "empresa": {
+      "nome": "Chiller Peças",
+      "razaoSocial": "CHILLER PECAS LTDA",
+      "cnpj": "35.028.609/0001-53",
+      "tagline": "Especialistas em refrigeração comercial e industrial",
+      "descricao": "Empresa brasileira especializada na revenda de peças e componentes originais para chillers, ar-condicionado comercial e industrial, refrigeração comercial e sistemas HVAC e VRF/VRV. Atendimento ágil, eficaz e diferenciado.",
+      "desde": 2019
+    },
+    "estatisticas": [
+      { "numero": "+30 mil", "rotulo": "peças em estoque" },
+      { "numero": "+5", "rotulo": "anos de mercado" },
+      { "numero": "+17 mil", "rotulo": "clientes atendidos" },
+      { "numero": "24h", "rotulo": "despacho em SP capital" }
+    ],
+    "tracking": {
+      "gtmId": "",
+      "ga4MeasurementId": "",
+      "googleSiteVerification": "",
+      "bingSiteVerification": "",
+      "metaPixelId": ""
+    },
+    "redesSociais": {
+      "instagram": "https://www.instagram.com/chillerpecas",
+      "facebook": "",
+      "linkedin": ""
+    },
+    "webhookLead": "https://webhook.hablla.com/v1/69eb660b9a7223d20a094b05",
+    "googleReviewsUrl": "https://share.google/4s2feuCqtetCznHZ9"
+  }
+}
