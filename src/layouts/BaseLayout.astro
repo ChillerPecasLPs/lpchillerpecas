@@ -280,6 +280,12 @@ const jsonLdGraph = {
     <meta name="twitter:image" content={ogImageURL} />
     <meta name="twitter:image:alt" content={`${s.empresa.nome} — ${s.empresa.tagline}`} />
 
+    <!-- Hablla HTM (rastreamento e automação) -->
+    <script is:inline>
+      window.htmConfig = { projectId: 'gm3hfj28', apiKey: '15d2b8c7661dbbbe71ece4ef1ee9cd00174817d335aa93d1761f95abcf842f7b' };
+    </script>
+    <script src="https://htm.hablla.com/htm.js" async is:inline></script>
+
     <!-- JSON-LD @graph multi-entidade -->
     <script type="application/ld+json" is:inline set:html={JSON.stringify(jsonLdGraph)} />
 

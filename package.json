@@ -13,6 +13,7 @@
   "dependencies": {
     "@astrojs/check": "^0.9.4",
     "@astrojs/sitemap": "^3.2.1",
+    "@astrojs/vercel": "^8.2.11",
     "@fontsource-variable/quicksand": "^5.1.0",
     "@fontsource/anton": "^5.1.0",
     "@fontsource/playfair-display": "^5.2.8",

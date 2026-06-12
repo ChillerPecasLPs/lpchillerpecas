@@ -1,8 +1,11 @@
 import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 import tailwindcss from '@tailwindcss/vite';
+import vercel from '@astrojs/vercel';
 
 export default defineConfig({
+  adapter: vercel(),
+  output: 'server',
   site: 'https://chiller-pecas.vercel.app',
   integrations: [
     sitemap({

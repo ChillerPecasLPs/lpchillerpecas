@@ -29,8 +29,8 @@
       { "numero": "24h", "rotulo": "despacho em SP capital" }
     ],
     "tracking": {
-      "gtmId": "",
-      "ga4MeasurementId": "",
+      "gtmId": "GTM-58KK6N8Z",
+      "ga4MeasurementId": "G-2HKG5HDVSC",
       "googleSiteVerification": "",
       "bingSiteVerification": "",
       "metaPixelId": ""
@@ -40,7 +40,7 @@
       "facebook": "",
       "linkedin": ""
     },
-    "webhookLead": "https://webhook.hablla.com/v1/69eb660b9a7223d20a094b05",
+    "webhookLead": "https://webhook.hablla.com/v1/6a280256975da5d37e38e29d",
     "googleReviewsUrl": "https://share.google/4s2feuCqtetCznHZ9"
   }
 }
